@@ -1,10 +1,9 @@
+// sort-imports-ignore
 import { createRoot } from "react-dom/client";
 
 import "./index.css";
 
-function App() {
-  return <div>Hello World</div>;
-}
+import App from "./App";
 
 const root = createRoot(document.getElementById("root")!);
 root.render(<App />);
