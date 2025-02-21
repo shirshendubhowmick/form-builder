@@ -17,15 +17,15 @@ function Input(props: InputProps) {
       {Boolean(label) && <span className="mb-2">{label}</span>}
       <input
         className={twJoin(
-          "mb-2 rounded-md border border-border p-2 hover:border-primary focus:outline-none focus-visible:border-primary",
-          error && "!border-error",
+          "border-color-border hover:border-color-primary focus-visible:border-color-primary mb-2 rounded-md border p-2 focus:outline-none",
+          error && "!border-color-error",
         )}
         id={id}
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...otherProps}
       />
       {Boolean(props.error) && (
-        <span className="text-error">{props.error}</span>
+        <span className="text-color-error">{props.error}</span>
       )}
     </label>
   );
