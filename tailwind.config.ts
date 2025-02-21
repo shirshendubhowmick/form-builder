@@ -13,7 +13,7 @@ const config = {
           dark: colors.gray[900],
         },
         "color-background": {
-          grey: colors.gray[100],
+          DEFAULT: colors.gray[100],
         },
         "color-primary": {
           DEFAULT: colors.blue[600],
