@@ -7,27 +7,27 @@ const config = {
   theme: {
     extend: {
       colors: {
-        text: {
+        "color": {
           light: colors.gray[400],
-          DEFAULT: colors.gray[700],
+          normal: colors.gray[700],
           dark: colors.gray[900],
         },
-        background: {
+        "color-background": {
           grey: colors.gray[100],
         },
-        primary: {
+        "color-primary": {
           DEFAULT: colors.blue[600],
           hover: colors.blue[700],
         },
-        success: {
+        "color-success": {
           DEFAULT: colors.green[500],
           hover: colors.green[600],
         },
-        error: {
+        "color-error": {
           DEFAULT: colors.red[500],
           hover: colors.red[600],
         },
-        border: colors.gray[300],
+        "color-border": colors.gray[300],
       },
       zIndex: {
         menu: "100",

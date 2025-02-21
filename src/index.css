@@ -15,7 +15,7 @@
   }
 
   body {
-    @apply text-base text-text;
+    @apply text-color-normal text-base;
   }
 
   h1 {
