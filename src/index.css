@@ -4,10 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@theme {
-  --font-roboto: "Outfit", serif;
-}
-
 @layer base {
   * {
     @apply leading-none;
@@ -19,7 +15,7 @@
   }
 
   body {
-    @apply text-text text-base;
+    @apply text-base text-text;
   }
 
   h1 {

@@ -1,5 +1,5 @@
 function App() {
-  return <div>Hello World</div>;
+  return <main className="mx-auto max-w-screen-xl p-6">App</main>;
 }
 
 export default App;
