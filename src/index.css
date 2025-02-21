@@ -1,0 +1,36 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+  --font-roboto: "Outfit", serif;
+}
+
+@layer base {
+  * {
+    @apply leading-none;
+
+    font-family: Outfit, serif;
+    font-style: normal;
+    font-weight: normal;
+    font-display: swap;
+  }
+
+  body {
+    @apply text-text text-base;
+  }
+
+  h1 {
+    @apply text-4xl font-bold tracking-tight;
+  }
+
+  h2 {
+    @apply text-3xl font-bold;
+  }
+
+  h3 {
+    @apply text-2xl font-medium;
+  }
+}

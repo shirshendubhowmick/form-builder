@@ -1,0 +1,16 @@
+{
+  "css.validate": false,
+  "editor.formatOnSave": true,
+  "files.insertFinalNewline": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "stylelint.enable": true,
+  "stylelint.validate": ["css"],
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["(?:twMerge|twJoin)\\(([^;]*)[\\);]", "[`'\"`]([^'\"`;]*)[`'\"`]"],
+    ["\\b(\\w*ClassName)=\"([^\"]+)\"", 2],
+    ["\\b(\\w*ClassName)={`([^`]+)`}", 2],
+    ["\\b(\\w*ClassName)={'([^']+)'}", 2]
+  ]
+}
