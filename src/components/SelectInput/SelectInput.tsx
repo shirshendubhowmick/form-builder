@@ -1,3 +1,4 @@
+import { Label } from "@radix-ui/react-label";
 import * as Select from "@radix-ui/react-select";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { useMemo } from "react";
@@ -13,6 +14,7 @@ export interface SelectInputProps {
   placeholder?: string;
   name: string;
   ariaLabel: string;
+  label?: string;
 }
 function SelectInput(props: SelectInputProps) {
   const sanitizedValue = useMemo(() => {
@@ -27,55 +29,60 @@ function SelectInput(props: SelectInputProps) {
   }, [props.options, props.value]);
 
   return (
-    <Select.Root
-      onValueChange={props.onValueChange}
-      value={sanitizedValue}
-      name={props.name}
-      key={props.name}
-    >
-      <Select.Trigger
-        aria-label={props.ariaLabel}
-        className={twMerge(
-          "border-color-border focus-visible:border-color-primary flex min-w-48 items-center justify-between rounded-md border border-solid p-2 focus:outline-none",
-          props.className,
-        )}
+    <Label className="inline-block">
+      {Boolean(props.label) && (
+        <span className="mb-2 block">{props.label}</span>
+      )}
+      <Select.Root
+        onValueChange={props.onValueChange}
+        value={sanitizedValue}
+        name={props.name}
+        key={props.name}
       >
-        <span className="truncate p-0.5">
-          <Select.Value placeholder={props.placeholder} />
-        </span>
-        <Select.Icon className="flex items-center" aria-hidden={false}>
-          <ChevronDownIcon className="text-color-light" size={16} />
-        </Select.Icon>
-      </Select.Trigger>
-      <Select.Content className="border-color-border z-menu rounded border border-solid bg-white">
-        <Select.ScrollUpButton className="border-color-border cursor-pointer border-b border-solid">
-          <ChevronUpIcon className="text-color-border mx-auto" />
-        </Select.ScrollUpButton>
-        <Select.Viewport>
-          {props.options.map((option) => {
-            return (
-              <Select.Item
-                key={option.value}
-                value={option.value}
-                className="hover:bg-color-background data-[highlighted]:bg-color-background border-color-border data-[state=checked]:text-color-primary flex max-w-full cursor-pointer items-center justify-between border-b p-4 outline-none last-of-type:border-b-0"
-              >
-                <Select.ItemText asChild>
-                  <span className="mr-1 max-w-full truncate">
-                    {option.label}
-                  </span>
-                </Select.ItemText>
-                <Select.ItemIndicator>
-                  <CheckIcon size={16} className="text-color-primary" />
-                </Select.ItemIndicator>
-              </Select.Item>
-            );
-          })}
-        </Select.Viewport>
-        <Select.ScrollDownButton className="border-color-border cursor-pointer border-t border-solid">
-          <ChevronDownIcon className="text-color-border mx-auto" />
-        </Select.ScrollDownButton>
-      </Select.Content>
-    </Select.Root>
+        <Select.Trigger
+          aria-label={props.ariaLabel}
+          className={twMerge(
+            "flex min-w-48 items-center justify-between rounded-md border border-solid border-color-border p-2 focus:outline-none focus-visible:border-color-primary",
+            props.className,
+          )}
+        >
+          <span className="truncate p-0.5">
+            <Select.Value placeholder={props.placeholder} />
+          </span>
+          <Select.Icon className="flex items-center" aria-hidden={false}>
+            <ChevronDownIcon className="text-color-light" size={16} />
+          </Select.Icon>
+        </Select.Trigger>
+        <Select.Content className="z-menu rounded border border-solid border-color-border bg-white">
+          <Select.ScrollUpButton className="cursor-pointer border-b border-solid border-color-border">
+            <ChevronUpIcon className="mx-auto text-color-border" />
+          </Select.ScrollUpButton>
+          <Select.Viewport>
+            {props.options.map((option) => {
+              return (
+                <Select.Item
+                  key={option.value}
+                  value={option.value}
+                  className="flex max-w-full cursor-pointer items-center justify-between border-b border-color-border p-4 outline-none last-of-type:border-b-0 hover:bg-color-background data-[highlighted]:bg-color-background data-[state=checked]:text-color-primary"
+                >
+                  <Select.ItemText asChild>
+                    <span className="mr-1 max-w-full truncate">
+                      {option.label}
+                    </span>
+                  </Select.ItemText>
+                  <Select.ItemIndicator>
+                    <CheckIcon size={16} className="text-color-primary" />
+                  </Select.ItemIndicator>
+                </Select.Item>
+              );
+            })}
+          </Select.Viewport>
+          <Select.ScrollDownButton className="cursor-pointer border-t border-solid border-color-border">
+            <ChevronDownIcon className="mx-auto text-color-border" />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Root>
+    </Label>
   );
 }
 
