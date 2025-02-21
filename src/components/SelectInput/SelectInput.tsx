@@ -15,6 +15,7 @@ export interface SelectInputProps {
   name: string;
   ariaLabel: string;
   label?: string;
+  error?: string | null;
 }
 function SelectInput(props: SelectInputProps) {
   const sanitizedValue = useMemo(() => {
@@ -42,7 +43,7 @@ function SelectInput(props: SelectInputProps) {
         <Select.Trigger
           aria-label={props.ariaLabel}
           className={twMerge(
-            "flex min-w-48 items-center justify-between rounded-md border border-solid border-color-border p-2 focus:outline-none focus-visible:border-color-primary",
+            "mb-2 flex min-w-48 items-center justify-between rounded-md border border-solid border-color-border p-2 focus:outline-none focus-visible:border-color-primary",
             props.className,
           )}
         >
@@ -82,6 +83,9 @@ function SelectInput(props: SelectInputProps) {
           </Select.ScrollDownButton>
         </Select.Content>
       </Select.Root>
+      {Boolean(props.error) && (
+        <span className="text-color-error">{props.error}</span>
+      )}
     </Label>
   );
 }
