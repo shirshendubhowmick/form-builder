@@ -12,7 +12,7 @@ function Input(props: InputProps) {
   return (
     <label
       htmlFor={id}
-      className={twMerge("inline-flex flex-col", props.className)}
+      className={twMerge("inline-flex min-w-48 flex-col", props.className)}
     >
       {Boolean(label) && <span className="mb-2">{label}</span>}
       <input
