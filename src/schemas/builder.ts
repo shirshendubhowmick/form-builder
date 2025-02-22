@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { ZodError } from "zod";
 
 const BaseInput = z.object({
   title: z.string().max(255).min(3),
@@ -64,3 +64,34 @@ export const SelectInput = BaseInput.extend({
 });
 
 export const BuilderSchema = z.union([TextInput, NumberInput, SelectInput]);
+
+interface ErrorMessages {
+  title?: string | null;
+  description?: string | null;
+  isRequired?: string | null;
+  maxLength?: string | null;
+  minLength?: string | null;
+  maxValue?: string | null;
+  minValue?: string | null;
+  options?: { [key: number]: string | null };
+}
+
+export function getBuilderSchemaErrors(error: ZodError): ErrorMessages | null {
+  if (!(error instanceof ZodError)) {
+    return null;
+  }
+
+  const errorMessages = error.issues.reduce((acc, issue) => {
+    if (issue.path[0] === "options") {
+      if (!acc.options) {
+        acc.options = {};
+      }
+      acc.options[Number(issue.path[1])] = issue.message as string;
+      return acc;
+    }
+    acc[issue.path[0] as keyof ErrorMessages] = issue.message as string;
+    return acc;
+  }, {} as ErrorMessages);
+
+  return errorMessages;
+}
