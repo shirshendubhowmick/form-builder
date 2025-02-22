@@ -3,7 +3,16 @@ import z from "zod";
 const BaseInput = z.object({
   title: z.string().max(255).min(3),
   description: z.string().nullable(),
-  required: z.boolean().default(false),
+  isRequired: z
+    .string()
+    .optional()
+    .transform((v) => {
+      if (v === "on") {
+        return true;
+      }
+      return false;
+    })
+    .pipe(z.boolean()),
 });
 
 export const TextInput = BaseInput.extend({
