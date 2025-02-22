@@ -17,10 +17,21 @@ export interface InputMetaInfoProps {
   initialState?: BuilderFormData;
 }
 
+function getIntialState(initialState?: BuilderFormData) {
+  if (initialState?.inputType === "options") {
+    return initialState.options.map((option, idx) => ({
+      id: idx,
+      defaultValue: option.value,
+    }));
+  }
+
+  return [{ id: 0, defaultValue: "" }];
+}
+
 function InputMetaInfo(props: InputMetaInfoProps) {
   const [optionIds, setOptionIds] = useState<
     { id: number; defaultValue?: string }[]
-  >([{ id: 0, defaultValue: "" }]);
+  >(getIntialState(props.initialState));
 
   const handleAddOption = useCallback(() => {
     setOptionIds((prev) => {
@@ -106,6 +117,8 @@ function InputMetaInfo(props: InputMetaInfoProps) {
                 placeholder="Lorem"
                 name={`option-${item.id}`}
                 className="mb-4 mr-4"
+                error={props.errorMessages.options?.[item.id]}
+                defaultValue={item.defaultValue}
               />
               <Button
                 type="button"
