@@ -57,8 +57,8 @@ export const SelectInput = BaseInput.extend({
   inputType: z.literal("options"),
   options: z.array(
     z.object({
-      label: z.string().min(3).max(255),
-      value: z.string().min(3).max(255),
+      label: z.string().min(1).max(255),
+      value: z.string().min(1).max(255),
     }),
   ),
 });
