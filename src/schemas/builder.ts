@@ -7,19 +7,45 @@ const BaseInput = z.object({
 });
 
 export const TextInput = BaseInput.extend({
-  type: z.literal("text"),
-  maxLength: z.number().default(255),
-  minLength: z.number().default(0),
+  inputType: z.literal("text"),
+  maxLength: z
+    .string()
+    .transform((val) => {
+      return Number(val);
+    })
+    .pipe(z.number().default(255)),
+  minLength: z
+    .string()
+    .transform((val) => {
+      return Number(val);
+    })
+    .pipe(z.number().default(3)),
 });
 
 export const NumberInput = BaseInput.extend({
-  type: z.literal("number"),
-  max: z.number().nullable(),
-  min: z.number().nullable(),
+  inputType: z.literal("number"),
+  maxValue: z
+    .string()
+    .transform((val) => {
+      if (!val) {
+        return null;
+      }
+      return Number(val);
+    })
+    .pipe(z.number().nullable()),
+  minValue: z
+    .string()
+    .transform((val) => {
+      if (!val) {
+        return null;
+      }
+      return Number(val);
+    })
+    .pipe(z.number().nullable()),
 });
 
 export const SelectInput = BaseInput.extend({
-  type: z.literal("options"),
+  inputType: z.literal("options"),
   options: z.array(
     z.object({
       label: z.string().min(3).max(255),
@@ -28,4 +54,4 @@ export const SelectInput = BaseInput.extend({
   ),
 });
 
-export const Input = z.union([TextInput, NumberInput, SelectInput]);
+export const BuilderSchema = z.union([TextInput, NumberInput, SelectInput]);
