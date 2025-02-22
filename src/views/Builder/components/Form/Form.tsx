@@ -22,7 +22,9 @@ export interface BuilderFormProps {
 }
 
 function Form(props: BuilderFormProps) {
-  const [inputType, setInputType] = useState<InputType>(INPUT_TYPES[0].value);
+  const [inputType, setInputType] = useState<InputType>(
+    props.initialState?.inputType ?? INPUT_TYPES[0].value,
+  );
 
   const [errorMessages, setErrorMessages] = useState<ErrorMessages>({});
 
