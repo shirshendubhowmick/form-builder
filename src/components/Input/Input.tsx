@@ -7,12 +7,12 @@ export interface InputProps
   className?: string;
 }
 function Input(props: InputProps) {
-  const { label, id, error, ...otherProps } = props;
+  const { label, id, error, className, ...otherProps } = props;
 
   return (
     <label
       htmlFor={id}
-      className={twMerge("inline-flex min-w-48 flex-col", props.className)}
+      className={twMerge("inline-flex min-w-48 flex-col", className)}
     >
       {Boolean(label) && <span className="mb-2">{label}</span>}
       <input
