@@ -1,5 +1,5 @@
 import * as Accordion from "@radix-ui/react-accordion";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, Trash2 } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import Button, { COLOR, INTENT } from "~/components/Button/Button";
@@ -41,6 +41,14 @@ function Builder() {
     setShowBuilderForm(true);
   }, []);
 
+  const onRemove = useCallback((formId: number) => {
+    setInputs((prev) => {
+      const newInputs = [...prev];
+      newInputs.splice(formId, 1);
+      return newInputs;
+    });
+  }, []);
+
   return (
     <div>
       <h1 className="mb-8">Form builder</h1>
@@ -60,12 +68,21 @@ function Builder() {
                 {DEBUG_MODE && (
                   <pre className="mb-8">{JSON.stringify(input, null, 2)}</pre>
                 )}
-
-                <Form
-                  onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate}
-                  initialState={input}
-                  formId={index}
-                />
+                <div className="flex flex-col">
+                  <Button
+                    intent={INTENT.icon}
+                    color={COLOR.error}
+                    className="self-end"
+                    onClick={() => onRemove(index)}
+                  >
+                    <Trash2 />
+                  </Button>
+                  <Form
+                    onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate}
+                    initialState={input}
+                    formId={index}
+                  />
+                </div>
               </Accordion.Content>
             </Accordion.Item>
           ))}
