@@ -5,6 +5,8 @@ import Button, { COLOR, INTENT } from "~/components/Button/Button";
 import Checkbox from "~/components/Checkbox/Checkbox";
 import Input from "~/components/Input/Input";
 import SelectInput from "~/components/SelectInput/SelectInput";
+import { BuilderSchema } from "~/schemas/builder";
+import { LabelValuePair } from "~/types";
 
 const inputTypes = [
   {
@@ -122,7 +124,28 @@ function Form() {
   const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+
+    if (formData.get("inputType") === "options") {
+      const options: LabelValuePair[] = [];
+      formData.forEach((value, key) => {
+        if (key.startsWith("option-")) {
+          options.push({
+            label: value as string,
+            value: value as string,
+          });
+          formData.delete(key);
+        }
+      });
+
+      const data = BuilderSchema.parse({
+        ...Object.fromEntries(formData.entries()),
+        options,
+      });
+      console.log(data);
+      return;
+    }
+
+    const data = BuilderSchema.parse(Object.fromEntries(formData.entries()));
     console.log(data);
   }, []);
 
