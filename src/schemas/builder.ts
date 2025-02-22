@@ -63,9 +63,10 @@ export const SelectInput = BaseInput.extend({
   ),
 });
 
-export const BuilderSchema = z.union([TextInput, NumberInput, SelectInput]);
+export const BuilderFormSchema = z.union([TextInput, NumberInput, SelectInput]);
+export type BuilderFormData = z.infer<typeof BuilderFormSchema>;
 
-interface ErrorMessages {
+export interface ErrorMessages {
   title?: string | null;
   description?: string | null;
   isRequired?: string | null;
@@ -76,9 +77,9 @@ interface ErrorMessages {
   options?: { [key: number]: string | null };
 }
 
-export function getBuilderSchemaErrors(error: ZodError): ErrorMessages | null {
+export function getBuilderSchemaErrors(error: ZodError): ErrorMessages {
   if (!(error instanceof ZodError)) {
-    return null;
+    return {};
   }
 
   const errorMessages = error.issues.reduce((acc, issue) => {
