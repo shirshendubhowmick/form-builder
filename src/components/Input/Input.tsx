@@ -17,7 +17,7 @@ function Input(props: InputProps) {
       {Boolean(label) && <span className="mb-2">{label}</span>}
       <input
         className={twJoin(
-          "mb-2 rounded-md border border-color-border p-2 hover:border-color-primary focus:outline-none focus-visible:border-color-primary",
+          "mb-2 rounded-md border border-color-border p-2 hover:border-color-primary focus:outline-none focus-visible:border-color-primary disabled:cursor-not-allowed disabled:hover:border-color-border",
           error && "!border-color-error",
         )}
         id={id}

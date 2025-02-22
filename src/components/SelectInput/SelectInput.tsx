@@ -16,6 +16,7 @@ export interface SelectInputProps {
   ariaLabel: string;
   label?: string;
   error?: string | null;
+  disabled?: boolean;
 }
 function SelectInput(props: SelectInputProps) {
   const sanitizedValue = useMemo(() => {
@@ -39,11 +40,12 @@ function SelectInput(props: SelectInputProps) {
         value={sanitizedValue}
         name={props.name}
         key={props.name}
+        disabled={props.disabled}
       >
         <Select.Trigger
           aria-label={props.ariaLabel}
           className={twMerge(
-            "mb-2 flex min-w-48 items-center justify-between rounded-md border border-solid border-color-border p-2 focus:outline-none focus-visible:border-color-primary",
+            "mb-2 flex min-w-48 cursor-not-allowed items-center justify-between rounded-md border border-solid border-color-border p-2 focus:outline-none focus-visible:border-color-primary disabled:bg-color-background",
             props.className,
           )}
         >
