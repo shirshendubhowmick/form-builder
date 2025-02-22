@@ -9,6 +9,7 @@ import { LabelValuePair } from "~/types";
 export interface SelectInputProps<T extends string> {
   onValueChange?: (value: T) => void;
   value?: string | null;
+  defaultValue?: string;
   options: readonly LabelValuePair[];
   className?: string;
   placeholder?: string;
@@ -41,6 +42,7 @@ function SelectInput<T extends string>(props: SelectInputProps<T>) {
         name={props.name}
         key={props.name}
         disabled={props.disabled}
+        defaultValue={props.defaultValue}
       >
         <Select.Trigger
           aria-label={props.ariaLabel}
