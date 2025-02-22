@@ -41,7 +41,7 @@ function InputMetaInfo(props: InputMetaInfoProps) {
           />
           <Input
             label="Maximum length"
-            placeholder="12"
+            placeholder="255"
             name="maxLength"
             type="number"
             error={props.errorMessages.maxLength}
