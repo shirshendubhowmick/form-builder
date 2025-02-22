@@ -119,6 +119,33 @@ export interface ButtonProps
   type?: "button" | "submit" | "reset";
 }
 
+type Intent = NonNullable<ButtonProps["intent"]>;
+
+export const INTENT: { [key in Intent]: Intent } = {
+  primary: "primary",
+  secondary: "secondary",
+  tertiary: "tertiary",
+  icon: "icon",
+};
+
+type Size = NonNullable<ButtonProps["size"]>;
+
+export const SIZE: { [key in Size]: Size } = {
+  xs: "xs",
+  sm: "sm",
+  md: "md",
+  lg: "lg",
+  full: "full",
+};
+
+type Color = NonNullable<ButtonProps["color"]>;
+
+export const COLOR: { [key in Color]: Color } = {
+  primary: "primary",
+  success: "success",
+  error: "error",
+};
+
 function Button(
   props: ButtonProps,
   ref: React.ForwardedRef<HTMLButtonElement>,
