@@ -8,12 +8,44 @@ import Renderer from "./views/Renderer/Renderer";
 function App() {
   const [builderFormData, setBuilderFormData] = useState<BuilderFormData[]>([
     {
-      title: "asdasd",
-      description: "asdasd",
-      isRequired: false,
+      title: "This is text",
+      description: "",
+      isRequired: true,
       inputType: "text",
-      maxLength: 7,
-      minLength: 5,
+      maxLength: 100,
+      minLength: 4,
+    },
+    {
+      title: "This is number",
+      description: "Some description",
+      isRequired: false,
+      inputType: "number",
+      maxValue: 564,
+      minValue: -8,
+    },
+    {
+      title: "This is option",
+      description: "Some description",
+      isRequired: false,
+      inputType: "options",
+      options: [
+        {
+          label: "Option 1",
+          value: "Option 1",
+        },
+        {
+          label: "Option 2",
+          value: "Option 2",
+        },
+        {
+          label: "Option 3",
+          value: "Option 3",
+        },
+        {
+          label: "Option 4",
+          value: "Option 4",
+        },
+      ],
     },
   ]);
 
@@ -40,7 +72,7 @@ function App() {
           setBuilderFormData={setBuilderFormData}
         />
       ) : (
-        <Renderer />
+        <Renderer schema={builderFormData} />
       )}
     </main>
   );
