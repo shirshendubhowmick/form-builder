@@ -8,25 +8,21 @@ import { BuilderFormData } from "~/schemas/builder";
 
 import Form from "./components/Form/Form";
 
-function Builder() {
-  const [inputs, setInputs] = useState<BuilderFormData[]>([
-    {
-      title: "asdasd",
-      description: "asdasd",
-      isRequired: false,
-      inputType: "text",
-      maxLength: 7,
-      minLength: 5,
-    },
-  ]);
+export interface BuilderProps {
+  builderFormData: BuilderFormData[];
+  setBuilderFormData: React.Dispatch<React.SetStateAction<BuilderFormData[]>>;
+}
+function Builder(props: BuilderProps) {
   const [showBuilderForm, setShowBuilderForm] = useState(false);
+
+  const { builderFormData, setBuilderFormData } = props;
 
   const onSuccessfulAddOrUpdate = useCallback(
     (data: BuilderFormData, formId?: number) => {
       if (typeof formId === "undefined") {
-        setInputs((prev) => [...prev, data]);
+        setBuilderFormData((prev) => [...prev, data]);
       } else {
-        setInputs((prev) => {
+        setBuilderFormData((prev) => {
           const newInputs = [...prev];
           newInputs[formId] = data;
           return newInputs;
@@ -34,27 +30,30 @@ function Builder() {
       }
       setShowBuilderForm(false);
     },
-    [],
+    [setBuilderFormData],
   );
 
   const onAddMore = useCallback(() => {
     setShowBuilderForm(true);
   }, []);
 
-  const onRemove = useCallback((formId: number) => {
-    setInputs((prev) => {
-      const newInputs = [...prev];
-      newInputs.splice(formId, 1);
-      return newInputs;
-    });
-  }, []);
+  const onRemove = useCallback(
+    (formId: number) => {
+      setBuilderFormData((prev) => {
+        const newInputs = [...prev];
+        newInputs.splice(formId, 1);
+        return newInputs;
+      });
+    },
+    [setBuilderFormData],
+  );
 
   return (
     <div>
       <h1 className="mb-8">Form builder</h1>
       <div>
         <Accordion.Root type="single" collapsible>
-          {inputs.map((input, index) => (
+          {builderFormData.map((input, index) => (
             // eslint-disable-next-line react/no-array-index-key
             <Accordion.Item key={index} value={String(index)}>
               <Accordion.Trigger className="group mb-4 flex w-full items-center justify-between rounded border border-s border-color-border bg-color-background p-4 text-left">
@@ -88,7 +87,7 @@ function Builder() {
           ))}
         </Accordion.Root>
 
-        {Boolean(inputs.length) && !showBuilderForm && (
+        {Boolean(builderFormData.length) && !showBuilderForm && (
           <Button
             color={COLOR.primary}
             intent={INTENT.primary}
@@ -97,7 +96,7 @@ function Builder() {
             Add more
           </Button>
         )}
-        {(!inputs.length || showBuilderForm) && (
+        {(!builderFormData.length || showBuilderForm) && (
           <Form onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate} />
         )}
       </div>
