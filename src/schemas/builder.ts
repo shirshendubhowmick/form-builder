@@ -65,6 +65,9 @@ export const SelectInput = BaseInput.extend({
 
 export const BuilderFormSchema = z.union([TextInput, NumberInput, SelectInput]);
 export type BuilderFormData = z.infer<typeof BuilderFormSchema>;
+export type BuilderFormTextInputData = z.infer<typeof TextInput>;
+export type BuilderFormNumberInputData = z.infer<typeof NumberInput>;
+export type BuilderFormSelectInputData = z.infer<typeof SelectInput>;
 
 export interface ErrorMessages {
   title?: string | null;
