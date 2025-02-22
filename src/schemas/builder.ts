@@ -1,6 +1,6 @@
 import z, { ZodError } from "zod";
 
-const BaseInput = z.object({
+const BaseInputSchema = z.object({
   title: z.string().max(255).min(3),
   description: z.string().nullable(),
   isRequired: z
@@ -15,7 +15,7 @@ const BaseInput = z.object({
     .pipe(z.boolean()),
 });
 
-export const TextInput = BaseInput.extend({
+export const TextInputSchema = BaseInputSchema.extend({
   inputType: z.literal("text"),
   maxLength: z
     .string()
@@ -31,7 +31,7 @@ export const TextInput = BaseInput.extend({
     .pipe(z.number().min(3).default(3)),
 });
 
-export const NumberInput = BaseInput.extend({
+export const NumberInputSchema = BaseInputSchema.extend({
   inputType: z.literal("number"),
   maxValue: z
     .string()
@@ -53,7 +53,7 @@ export const NumberInput = BaseInput.extend({
     .pipe(z.number().nullable()),
 });
 
-export const SelectInput = BaseInput.extend({
+export const SelectInputSchema = BaseInputSchema.extend({
   inputType: z.literal("options"),
   options: z.array(
     z.object({
@@ -63,11 +63,15 @@ export const SelectInput = BaseInput.extend({
   ),
 });
 
-export const BuilderFormSchema = z.union([TextInput, NumberInput, SelectInput]);
+export const BuilderFormSchema = z.union([
+  TextInputSchema,
+  NumberInputSchema,
+  SelectInputSchema,
+]);
 export type BuilderFormData = z.infer<typeof BuilderFormSchema>;
-export type BuilderFormTextInputData = z.infer<typeof TextInput>;
-export type BuilderFormNumberInputData = z.infer<typeof NumberInput>;
-export type BuilderFormSelectInputData = z.infer<typeof SelectInput>;
+export type BuilderFormTextInputData = z.infer<typeof TextInputSchema>;
+export type BuilderFormNumberInputData = z.infer<typeof NumberInputSchema>;
+export type BuilderFormSelectInputData = z.infer<typeof SelectInputSchema>;
 
 export interface ErrorMessages {
   title?: string | null;
