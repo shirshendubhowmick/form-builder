@@ -1,3 +1,5 @@
+import * as Accordion from "@radix-ui/react-accordion";
+import { ChevronDownIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import Button, { COLOR, INTENT } from "~/components/Button/Button";
@@ -11,6 +13,7 @@ function Builder() {
 
   const onSuccessfulAdd = useCallback((data: BuilderFormData) => {
     setInputs((prev) => [...prev, data]);
+    setShowBuilderForm(false);
   }, []);
 
   const onAddMore = useCallback(() => {
@@ -21,12 +24,23 @@ function Builder() {
     <div>
       <h1 className="mb-8">Form builder</h1>
       <div>
-        {inputs.map((input, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <div key={index}>
-            <pre>{JSON.stringify(input, null, 2)}</pre>
-          </div>
-        ))}
+        <Accordion.Root type="single">
+          {inputs.map((input, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Accordion.Item key={index} value={String(index)}>
+              <Accordion.Trigger className="group mb-4 flex w-full items-center justify-between rounded border border-s border-color-border bg-color-background p-4 text-left">
+                <span>{input.title}</span>
+                <ChevronDownIcon
+                  aria-hidden
+                  className="transition-transform group-data-[state=open]:rotate-180"
+                />
+              </Accordion.Trigger>
+              <Accordion.Content className="mb-4 border-b p-4">
+                Test 123
+              </Accordion.Content>
+            </Accordion.Item>
+          ))}
+        </Accordion.Root>
 
         {Boolean(inputs.length) && !showBuilderForm && (
           <Button
