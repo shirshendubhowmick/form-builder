@@ -24,8 +24,8 @@ const config = {
           hover: colors.emerald[700],
         },
         "color-error": {
-          DEFAULT: colors.red[500],
-          hover: colors.red[600],
+          DEFAULT: colors.red[600],
+          hover: colors.red[700],
         },
         "color-border": colors.gray[300],
       },
