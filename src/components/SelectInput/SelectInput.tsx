@@ -6,10 +6,10 @@ import { twMerge } from "tailwind-merge";
 
 import { LabelValuePair } from "~/types";
 
-export interface SelectInputProps {
-  onValueChange?: (value: string) => void;
+export interface SelectInputProps<T extends string> {
+  onValueChange?: (value: T) => void;
   value?: string | null;
-  options: LabelValuePair[];
+  options: readonly LabelValuePair[];
   className?: string;
   placeholder?: string;
   name: string;
@@ -18,7 +18,7 @@ export interface SelectInputProps {
   error?: string | null;
   disabled?: boolean;
 }
-function SelectInput(props: SelectInputProps) {
+function SelectInput<T extends string>(props: SelectInputProps<T>) {
   const sanitizedValue = useMemo(() => {
     if (typeof props.value === "undefined") {
       return undefined;
@@ -45,7 +45,7 @@ function SelectInput(props: SelectInputProps) {
         <Select.Trigger
           aria-label={props.ariaLabel}
           className={twMerge(
-            "mb-2 flex min-w-48 cursor-not-allowed items-center justify-between rounded-md border border-solid border-color-border p-2 focus:outline-none focus-visible:border-color-primary disabled:bg-color-background",
+            "flex min-w-48 cursor-not-allowed items-center justify-between rounded-md border border-solid border-color-border p-2 focus:outline-none focus-visible:border-color-primary disabled:bg-color-background",
             props.className,
           )}
         >
