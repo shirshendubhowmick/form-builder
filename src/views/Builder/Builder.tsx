@@ -53,7 +53,7 @@ function Builder() {
     <div>
       <h1 className="mb-8">Form builder</h1>
       <div>
-        <Accordion.Root type="single">
+        <Accordion.Root type="single" collapsible>
           {inputs.map((input, index) => (
             // eslint-disable-next-line react/no-array-index-key
             <Accordion.Item key={index} value={String(index)}>
