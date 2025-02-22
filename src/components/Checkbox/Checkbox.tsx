@@ -1,5 +1,6 @@
 import { Indicator, Root } from "@radix-ui/react-checkbox";
 import { CheckIcon } from "lucide-react";
+import { twMerge } from "tailwind-merge";
 
 export interface CheckboxProps {
   defaulChecked?: boolean;
@@ -7,11 +8,14 @@ export interface CheckboxProps {
   id?: string;
   name: string;
   disabled?: boolean;
+  className?: string;
 }
 function Checkbox(props: CheckboxProps) {
   return (
-    <label htmlFor={props.id} className="inline-flex flex-col">
-      {Boolean(props.label) && <span className="mb-2">{props.label}</span>}
+    <label
+      htmlFor={props.id}
+      className={twMerge("inline-flex items-center", props.className)}
+    >
       <Root
         id={props.id}
         defaultChecked={props.defaulChecked}
@@ -23,6 +27,7 @@ function Checkbox(props: CheckboxProps) {
           <CheckIcon size={16} className="text-color-primary" />
         </Indicator>
       </Root>
+      {Boolean(props.label) && <span className="ml-2">{props.label}</span>}
     </label>
   );
 }
