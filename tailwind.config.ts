@@ -13,15 +13,15 @@ const config = {
           dark: colors.gray[900],
         },
         "color-background": {
-          DEFAULT: colors.gray[100],
+          DEFAULT: colors.gray[200],
         },
         "color-primary": {
           DEFAULT: colors.blue[600],
           hover: colors.blue[700],
         },
         "color-success": {
-          DEFAULT: colors.green[500],
-          hover: colors.green[600],
+          DEFAULT: colors.emerald[600],
+          hover: colors.emerald[700],
         },
         "color-error": {
           DEFAULT: colors.red[500],
