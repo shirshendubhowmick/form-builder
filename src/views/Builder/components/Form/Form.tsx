@@ -5,7 +5,12 @@ import Button, { COLOR, INTENT } from "~/components/Button/Button";
 import Checkbox from "~/components/Checkbox/Checkbox";
 import Input from "~/components/Input/Input";
 import SelectInput from "~/components/SelectInput/SelectInput";
-import { BuilderSchema } from "~/schemas/builder";
+import {
+  BuilderFormData,
+  BuilderFormSchema,
+  ErrorMessages,
+  getBuilderSchemaErrors,
+} from "~/schemas/builder";
 import { LabelValuePair } from "~/types";
 
 const inputTypes = [
@@ -23,9 +28,11 @@ const inputTypes = [
   },
 ] as const;
 
-function InputTypeComponent(props: {
+export interface InputMetaInfoProps {
   type: (typeof inputTypes)[number]["value"];
-}) {
+  errorMessages: ErrorMessages;
+}
+function InputMetaInfo(props: InputMetaInfoProps) {
   const [optionIds, setOptionIds] = useState<number[]>([0]);
 
   const handleAddOption = useCallback(() => {
@@ -51,12 +58,14 @@ function InputTypeComponent(props: {
             name="minLength"
             className="mr-8"
             type="number"
+            error={props.errorMessages.minLength}
           />
           <Input
             label="Maximum length"
             placeholder="12"
             name="maxLength"
             type="number"
+            error={props.errorMessages.maxLength}
           />
         </div>
       );
@@ -69,12 +78,14 @@ function InputTypeComponent(props: {
             name="minValue"
             className="mr-8"
             type="number"
+            error={props.errorMessages.minValue}
           />
           <Input
             label="Maximum value"
             placeholder="1080"
             name="maxValue"
             type="number"
+            error={props.errorMessages.minValue}
           />
         </div>
       );
@@ -116,38 +127,61 @@ function InputTypeComponent(props: {
   }
 }
 
-function Form() {
+export interface BuilderFormProps {
+  onSuccessfulAdd: (data: BuilderFormData) => void;
+}
+
+function Form(props: BuilderFormProps) {
   const [inputType, setInputType] = useState<
-    (typeof inputTypes)[number]["value"] | null
-  >(null);
+    (typeof inputTypes)[number]["value"]
+  >(inputTypes[0].value);
 
-  const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+  const [errorMessages, setErrorMessages] = useState<ErrorMessages>({});
 
-    if (formData.get("inputType") === "options") {
-      const options: LabelValuePair[] = [];
-      formData.forEach((value, key) => {
-        if (key.startsWith("option-")) {
-          options.push({
-            label: value as string,
-            value: value as string,
-          });
-          formData.delete(key);
+  const { onSuccessfulAdd } = props;
+
+  const onSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const formData = new FormData(e.currentTarget);
+
+      if (formData.get("inputType") === "options") {
+        const options: LabelValuePair[] = [];
+        formData.forEach((value, key) => {
+          if (key.startsWith("option-")) {
+            options.push({
+              label: value as string,
+              value: value as string,
+            });
+          }
+        });
+
+        const result = BuilderFormSchema.safeParse({
+          ...Object.fromEntries(formData.entries()),
+          options,
+        });
+
+        if (!result.success) {
+          setErrorMessages(getBuilderSchemaErrors(result.error));
+          return;
         }
-      });
 
-      const data = BuilderSchema.parse({
-        ...Object.fromEntries(formData.entries()),
-        options,
-      });
-      console.log(data);
-      return;
-    }
+        onSuccessfulAdd(result.data);
 
-    const data = BuilderSchema.parse(Object.fromEntries(formData.entries()));
-    console.log(data);
-  }, []);
+        return;
+      }
+
+      const result = BuilderFormSchema.safeParse(
+        Object.fromEntries(formData.entries()),
+      );
+      if (!result.success) {
+        setErrorMessages(getBuilderSchemaErrors(result.error));
+        return;
+      }
+      onSuccessfulAdd(result.data);
+    },
+    [onSuccessfulAdd],
+  );
 
   return (
     <form className="flex flex-col" onSubmit={onSubmit}>
@@ -156,26 +190,30 @@ function Form() {
         placeholder="What is your name ?"
         name="title"
         className="mb-4"
+        error={errorMessages.title}
       />
       <Input
         label="Question description"
         placeholder="Type your question here"
         name="description"
         className="mb-4"
+        error={errorMessages.description}
       />
       <div className="mb-4 flex items-center">
         <SelectInput<(typeof inputTypes)[number]["value"]>
-          placeholder="Input type"
           options={inputTypes}
           label="Select an input type"
           name="inputType"
           ariaLabel="Input type"
           onValueChange={setInputType}
           className="mr-8"
+          defaultValue={inputTypes[0].value}
         />
         <Checkbox name="isRequired" label="Required ?" className="mt-4" />
       </div>
-      {Boolean(inputType) && <InputTypeComponent type={inputType!} />}
+      {Boolean(inputType) && (
+        <InputMetaInfo type={inputType!} errorMessages={errorMessages} />
+      )}
       <Button type="submit" intent={INTENT.primary} color={COLOR.primary}>
         Add
       </Button>
