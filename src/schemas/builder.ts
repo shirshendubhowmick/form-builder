@@ -22,13 +22,13 @@ export const TextInput = BaseInput.extend({
     .transform((val) => {
       return Number(val);
     })
-    .pipe(z.number().default(255)),
+    .pipe(z.number().min(3).default(255)),
   minLength: z
     .string()
     .transform((val) => {
       return Number(val);
     })
-    .pipe(z.number().default(3)),
+    .pipe(z.number().min(3).default(3)),
 });
 
 export const NumberInput = BaseInput.extend({
