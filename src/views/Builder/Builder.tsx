@@ -3,18 +3,39 @@ import { ChevronDownIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import Button, { COLOR, INTENT } from "~/components/Button/Button";
+import { DEBUG_MODE } from "~/constants";
 import { BuilderFormData } from "~/schemas/builder";
 
 import Form from "./components/Form/Form";
 
 function Builder() {
-  const [inputs, setInputs] = useState<BuilderFormData[]>([]);
+  const [inputs, setInputs] = useState<BuilderFormData[]>([
+    {
+      title: "asdasd",
+      description: "asdasd",
+      isRequired: false,
+      inputType: "text",
+      maxLength: 7,
+      minLength: 5,
+    },
+  ]);
   const [showBuilderForm, setShowBuilderForm] = useState(false);
 
-  const onSuccessfulAdd = useCallback((data: BuilderFormData) => {
-    setInputs((prev) => [...prev, data]);
-    setShowBuilderForm(false);
-  }, []);
+  const onSuccessfulAddOrUpdate = useCallback(
+    (data: BuilderFormData, formId?: number) => {
+      if (typeof formId === "undefined") {
+        setInputs((prev) => [...prev, data]);
+      } else {
+        setInputs((prev) => {
+          const newInputs = [...prev];
+          newInputs[formId] = data;
+          return newInputs;
+        });
+      }
+      setShowBuilderForm(false);
+    },
+    [],
+  );
 
   const onAddMore = useCallback(() => {
     setShowBuilderForm(true);
@@ -36,7 +57,15 @@ function Builder() {
                 />
               </Accordion.Trigger>
               <Accordion.Content className="mb-4 border-b p-4">
-                Test 123
+                {DEBUG_MODE && (
+                  <pre className="mb-8">{JSON.stringify(input, null, 2)}</pre>
+                )}
+
+                <Form
+                  onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate}
+                  initialState={input}
+                  formId={index}
+                />
               </Accordion.Content>
             </Accordion.Item>
           ))}
@@ -52,7 +81,7 @@ function Builder() {
           </Button>
         )}
         {(!inputs.length || showBuilderForm) && (
-          <Form onSuccessfulAdd={onSuccessfulAdd} />
+          <Form onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate} />
         )}
       </div>
     </div>

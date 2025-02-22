@@ -16,7 +16,9 @@ import { LabelValuePair } from "~/types";
 import InputMetaInfo from "../InputMetaInfo/InputMetaInfo";
 
 export interface BuilderFormProps {
-  onSuccessfulAdd: (data: BuilderFormData) => void;
+  onSuccessfulAddOrUpdate: (data: BuilderFormData, formId?: number) => void;
+  initialState?: BuilderFormData;
+  formId?: number;
 }
 
 function Form(props: BuilderFormProps) {
@@ -24,7 +26,7 @@ function Form(props: BuilderFormProps) {
 
   const [errorMessages, setErrorMessages] = useState<ErrorMessages>({});
 
-  const { onSuccessfulAdd } = props;
+  const { onSuccessfulAddOrUpdate, formId } = props;
 
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -52,7 +54,7 @@ function Form(props: BuilderFormProps) {
           return;
         }
 
-        onSuccessfulAdd(result.data);
+        onSuccessfulAddOrUpdate(result.data, formId);
 
         return;
       }
@@ -64,9 +66,9 @@ function Form(props: BuilderFormProps) {
         setErrorMessages(getBuilderSchemaErrors(result.error));
         return;
       }
-      onSuccessfulAdd(result.data);
+      onSuccessfulAddOrUpdate(result.data, formId);
     },
-    [onSuccessfulAdd],
+    [formId, onSuccessfulAddOrUpdate],
   );
 
   return (
@@ -77,6 +79,7 @@ function Form(props: BuilderFormProps) {
         name="title"
         className="mb-4"
         error={errorMessages.title}
+        defaultValue={props.initialState?.title}
       />
       <Input
         label="Question description"
@@ -84,6 +87,7 @@ function Form(props: BuilderFormProps) {
         name="description"
         className="mb-4"
         error={errorMessages.description}
+        defaultValue={props.initialState?.description ?? undefined}
       />
       <div className="mb-4 flex items-center">
         <SelectInput<InputType>
@@ -93,15 +97,27 @@ function Form(props: BuilderFormProps) {
           ariaLabel="Input type"
           onValueChange={setInputType}
           className="mr-8"
-          defaultValue={INPUT_TYPES[0].value}
+          defaultValue={props.initialState?.inputType || INPUT_TYPES[0].value}
         />
-        <Checkbox name="isRequired" label="Required ?" className="mt-4" />
+        <Checkbox
+          name="isRequired"
+          label="Required ?"
+          className="mt-4"
+          defaulChecked={props.initialState?.isRequired}
+        />
       </div>
       {Boolean(inputType) && (
-        <InputMetaInfo type={inputType!} errorMessages={errorMessages} />
+        <InputMetaInfo
+          type={inputType!}
+          errorMessages={errorMessages}
+          initialState={props.initialState}
+        />
+      )}
+      {typeof props.formId !== "undefined" && (
+        <input type="hidden" value={props.formId} name="formId" />
       )}
       <Button type="submit" intent={INTENT.primary} color={COLOR.primary}>
-        Add
+        {typeof props.formId === "undefined" ? "Add" : "Update"}
       </Button>
     </form>
   );

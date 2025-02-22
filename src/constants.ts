@@ -14,3 +14,5 @@ export const INPUT_TYPES = [
 ] as const;
 
 export type InputType = (typeof INPUT_TYPES)[number]["value"];
+
+export const DEBUG_MODE = true;

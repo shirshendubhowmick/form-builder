@@ -4,26 +4,40 @@ import { useCallback, useState } from "react";
 import Button, { COLOR, INTENT } from "~/components/Button/Button";
 import Input from "~/components/Input/Input";
 import { InputType } from "~/constants";
-import { ErrorMessages } from "~/schemas/builder";
+import {
+  BuilderFormData,
+  BuilderFormNumberInputData,
+  BuilderFormTextInputData,
+  ErrorMessages,
+} from "~/schemas/builder";
 
 export interface InputMetaInfoProps {
   type: InputType;
   errorMessages: ErrorMessages;
+  initialState?: BuilderFormData;
 }
 
 function InputMetaInfo(props: InputMetaInfoProps) {
-  const [optionIds, setOptionIds] = useState<number[]>([0]);
+  const [optionIds, setOptionIds] = useState<
+    { id: number; defaultValue?: string }[]
+  >([{ id: 0, defaultValue: "" }]);
 
   const handleAddOption = useCallback(() => {
     setOptionIds((prev) => {
-      const lastId = prev[prev.length - 1];
-      return [...prev, lastId + 1];
+      const lstIetm = prev[prev.length - 1];
+      return [
+        ...prev,
+        {
+          id: lstIetm.id + 1,
+          defaultValue: "",
+        },
+      ];
     });
   }, []);
 
   const handleRemoveOption = useCallback((id: number) => {
     setOptionIds((prev) => {
-      return prev.filter((i) => i !== id);
+      return prev.filter((i) => i.id !== id);
     });
   }, []);
 
@@ -38,6 +52,9 @@ function InputMetaInfo(props: InputMetaInfoProps) {
             className="mr-8"
             type="number"
             error={props.errorMessages.minLength}
+            defaultValue={
+              (props.initialState as BuilderFormTextInputData)?.minLength
+            }
           />
           <Input
             label="Maximum length"
@@ -45,6 +62,9 @@ function InputMetaInfo(props: InputMetaInfoProps) {
             name="maxLength"
             type="number"
             error={props.errorMessages.maxLength}
+            defaultValue={
+              (props.initialState as BuilderFormTextInputData)?.maxLength
+            }
           />
         </div>
       );
@@ -58,6 +78,10 @@ function InputMetaInfo(props: InputMetaInfoProps) {
             className="mr-8"
             type="number"
             error={props.errorMessages.minValue}
+            defaultValue={
+              (props.initialState as BuilderFormNumberInputData)?.minValue ??
+              undefined
+            }
           />
           <Input
             label="Maximum value"
@@ -65,18 +89,22 @@ function InputMetaInfo(props: InputMetaInfoProps) {
             name="maxValue"
             type="number"
             error={props.errorMessages.minValue}
+            defaultValue={
+              (props.initialState as BuilderFormNumberInputData)?.maxValue ??
+              undefined
+            }
           />
         </div>
       );
     case "options":
       return (
         <div className="mb-8 flex flex-col">
-          {optionIds.map((id, idx) => (
-            <div className="flex items-center" key={id}>
+          {optionIds.map((item, idx) => (
+            <div className="flex items-center" key={item.id}>
               <Input
                 label={`Option ${idx + 1}`}
                 placeholder="Lorem"
-                name={`option-${id}`}
+                name={`option-${item.id}`}
                 className="mb-4 mr-4"
               />
               <Button
@@ -84,7 +112,7 @@ function InputMetaInfo(props: InputMetaInfoProps) {
                 intent={INTENT.icon}
                 color={COLOR.error}
                 disabled={optionIds.length === 1}
-                onClick={() => handleRemoveOption(id)}
+                onClick={() => handleRemoveOption(item.id)}
               >
                 <Trash2 />
               </Button>
