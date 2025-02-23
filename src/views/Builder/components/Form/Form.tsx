@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import Button, { COLOR, INTENT } from "~/components/Button/Button";
 import Checkbox from "~/components/Checkbox/Checkbox";
@@ -6,6 +6,7 @@ import Input from "~/components/Input/Input";
 import SelectInput from "~/components/SelectInput/SelectInput";
 import { INPUT_TYPES, InputType } from "~/constants";
 import { BuilderFormData, ErrorMessages } from "~/schemas/builder";
+import { debounce } from "~/utils";
 
 import InputMetaInfo from "../InputMetaInfo/InputMetaInfo";
 import { parseFormData } from "./util";
@@ -20,8 +21,8 @@ function Form(props: BuilderFormProps) {
   const [inputType, setInputType] = useState<InputType>(
     props.initialState?.inputType ?? INPUT_TYPES[0].value,
   );
-
   const [errorMessages, setErrorMessages] = useState<ErrorMessages>({});
+  const formRef = useRef<HTMLFormElement>(null);
 
   const { onSuccessfulAddOrUpdate, formId } = props;
 
@@ -44,13 +45,20 @@ function Form(props: BuilderFormProps) {
     [formId, onSuccessfulAddOrUpdate],
   );
 
-  const onChange = useCallback((e: React.ChangeEvent<HTMLFormElement>) => {
-    const formData = new FormData(e.currentTarget);
-    console.log("formData", formData);
+  const onChange = useCallback(() => {
+    const formData = new FormData(formRef.current!);
+    console.log("formData", Object.fromEntries(formData.entries()));
   }, []);
 
+  const debouncedOnChange = useMemo(() => debounce(onChange, 1000), [onChange]);
+
   return (
-    <form className="flex flex-col" onSubmit={onSubmit} onChange={onChange}>
+    <form
+      className="flex flex-col"
+      onSubmit={onSubmit}
+      onChange={debouncedOnChange}
+      ref={formRef}
+    >
       <Input
         label="Question title"
         placeholder="What is your name ?"
