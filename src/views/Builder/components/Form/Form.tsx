@@ -5,15 +5,10 @@ import Checkbox from "~/components/Checkbox/Checkbox";
 import Input from "~/components/Input/Input";
 import SelectInput from "~/components/SelectInput/SelectInput";
 import { INPUT_TYPES, InputType } from "~/constants";
-import {
-  BuilderFormData,
-  BuilderFormSchema,
-  ErrorMessages,
-  getBuilderSchemaErrors,
-} from "~/schemas/builder";
-import { LabelValuePair } from "~/types";
+import { BuilderFormData, ErrorMessages } from "~/schemas/builder";
 
 import InputMetaInfo from "../InputMetaInfo/InputMetaInfo";
+import { parseFormData } from "./util";
 
 export interface BuilderFormProps {
   onSuccessfulAddOrUpdate: (data: BuilderFormData, formId?: number) => void;
@@ -35,46 +30,27 @@ function Form(props: BuilderFormProps) {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
 
-      if (formData.get("inputType") === "options") {
-        const options: LabelValuePair[] = [];
-        formData.forEach((value, key) => {
-          if (key.startsWith("option-")) {
-            options.push({
-              label: value as string,
-              value: value as string,
-            });
-          }
-        });
+      const { data, errorMessages: errors } = parseFormData(formData);
 
-        const result = BuilderFormSchema.safeParse({
-          ...Object.fromEntries(formData.entries()),
-          options,
-        });
-
-        if (!result.success) {
-          setErrorMessages(getBuilderSchemaErrors(result.error));
-          return;
-        }
-
-        onSuccessfulAddOrUpdate(result.data, formId);
-
+      if (data) {
+        onSuccessfulAddOrUpdate(data, formId);
         return;
       }
 
-      const result = BuilderFormSchema.safeParse(
-        Object.fromEntries(formData.entries()),
-      );
-      if (!result.success) {
-        setErrorMessages(getBuilderSchemaErrors(result.error));
-        return;
+      if (errors) {
+        setErrorMessages(errors);
       }
-      onSuccessfulAddOrUpdate(result.data, formId);
     },
     [formId, onSuccessfulAddOrUpdate],
   );
 
+  const onChange = useCallback((e: React.ChangeEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    console.log("formData", formData);
+  }, []);
+
   return (
-    <form className="flex flex-col" onSubmit={onSubmit}>
+    <form className="flex flex-col" onSubmit={onSubmit} onChange={onChange}>
       <Input
         label="Question title"
         placeholder="What is your name ?"
