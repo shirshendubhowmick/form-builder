@@ -22,13 +22,10 @@ const AUTO_SAVE_STATUS = {
 
 export interface BuilderProps {
   builderFormData: BuilderFormData[];
-  onSubmit: (
-    data: BuilderFormData,
-    schemaId?: string,
-    questionId?: number,
-  ) => Promise<void>;
+  onSubmit: () => Promise<void>;
   onChange: (
     data: BuilderFormData,
+    isNewEntry: boolean,
     schemaId?: string,
     questionId?: number,
   ) => Promise<void>;
@@ -45,13 +42,10 @@ function Builder(props: BuilderProps) {
   const { builderFormData, onSubmit, schemaId, onQuestionRemove, onChange } =
     props;
 
-  const onSuccessfulAddOrUpdate = useCallback(
-    async (data: BuilderFormData, questionId?: number) => {
-      await onSubmit(data, schemaId, questionId);
-      setShowBuilderForm(false);
-    },
-    [onSubmit, schemaId],
-  );
+  const onSuccessfulAddOrUpdate = useCallback(async () => {
+    await onSubmit();
+    setShowBuilderForm(false);
+  }, [onSubmit]);
 
   const onAddMore = useCallback(() => {
     setShowBuilderForm(true);
@@ -67,9 +61,9 @@ function Builder(props: BuilderProps) {
   );
 
   const onSuccessfulChange = useCallback(
-    async (data: BuilderFormData, inputId?: number) => {
+    async (data: BuilderFormData, isNewEntry?: boolean, inputId?: number) => {
       setAutoSaveStatus(AUTO_SAVE_STATUS.LOADING);
-      await onChange(data, schemaId, inputId);
+      await onChange(data, isNewEntry ?? false, schemaId, inputId);
       setAutoSaveStatus(AUTO_SAVE_STATUS.SAVED);
     },
     [onChange, schemaId],
@@ -142,6 +136,7 @@ function Builder(props: BuilderProps) {
           <Form
             onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate}
             onSuccessfulChange={onSuccessfulChange}
+            isNewEntry
           />
         )}
       </div>
