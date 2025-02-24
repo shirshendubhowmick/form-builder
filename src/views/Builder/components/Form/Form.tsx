@@ -13,7 +13,12 @@ import { parseFormData } from "./util";
 
 export interface BuilderFormProps {
   onSuccessfulAddOrUpdate: (data: BuilderFormData, questionId?: number) => void;
-  onSuccessfulChange: (data: BuilderFormData, questionId?: number) => void;
+  onSuccessfulChange: (
+    data: BuilderFormData,
+    isNewEntry?: boolean,
+    questionId?: number,
+  ) => void;
+  isNewEntry?: boolean;
   initialState?: BuilderFormData;
   questionId?: number;
 }
@@ -25,7 +30,12 @@ function Form(props: BuilderFormProps) {
   const [errorMessages, setErrorMessages] = useState<ErrorMessages>({});
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { onSuccessfulAddOrUpdate, questionId, onSuccessfulChange } = props;
+  const {
+    onSuccessfulAddOrUpdate,
+    questionId,
+    onSuccessfulChange,
+    isNewEntry,
+  } = props;
 
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -51,14 +61,15 @@ function Form(props: BuilderFormProps) {
     const { data, errorMessages: errors } = parseFormData(formData);
 
     if (data) {
-      onSuccessfulChange(data, questionId);
+      setErrorMessages({});
+      onSuccessfulChange(data, isNewEntry, questionId);
       return;
     }
 
     if (errors) {
       setErrorMessages(errors);
     }
-  }, [questionId, onSuccessfulChange]);
+  }, [onSuccessfulChange, isNewEntry, questionId]);
 
   const debouncedOnChange = useMemo(() => debounce(onChange, 1000), [onChange]);
 
