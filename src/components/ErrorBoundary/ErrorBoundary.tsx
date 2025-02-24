@@ -11,6 +11,11 @@ class ErrorBoundary extends Component<
     this.state = { hasError: false };
   }
 
+  static getDerivedStateFromError(error: Error) {
+    console.error("ErrorBoundary caught an error", error);
+    return { hasError: true };
+  }
+
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     this.setState({ hasError: true });
     console.error("ErrorBoundary caught an error", error, errorInfo);
@@ -18,7 +23,9 @@ class ErrorBoundary extends Component<
 
   render() {
     return this.state.hasError ? (
-      <h1>Something went wrong, please try again</h1>
+      <main className="flex h-screen w-screen items-center justify-center">
+        <h1>Something went wrong, please try again</h1>
+      </main>
     ) : (
       this.props.children
     );
