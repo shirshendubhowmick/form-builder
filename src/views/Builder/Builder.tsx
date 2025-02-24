@@ -113,7 +113,7 @@ function Builder(props: BuilderProps) {
                         <LoaderCircle className="animate-spin text-color-primary" />
                       )}
                       {autoSaveStatus === AUTO_SAVE_STATUS.SAVED && (
-                        <BadgeCheck className="fade-away text-color-success" />
+                        <BadgeCheck className="text-color-success" />
                       )}
                     </span>
                     <Button
