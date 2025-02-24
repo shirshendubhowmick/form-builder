@@ -1,59 +1,71 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import Button, { COLOR, INTENT, SIZE } from "./components/Button/Button";
 import { BuilderFormData } from "./schemas/builder";
+import {
+  addSchema,
+  deleteQuestionFromSchema,
+  getSchemas,
+  updateSchema,
+} from "./services/api";
 import Builder from "./views/Builder/Builder";
 import Renderer from "./views/Renderer/Renderer";
 
 function App() {
-  const [builderFormData, setBuilderFormData] = useState<BuilderFormData[]>([
+  const [builderFormSchema, setBuilderFormSchema] = useState<
     {
-      title: "This is text",
-      description: "",
-      isRequired: true,
-      inputType: "text",
-      maxLength: 100,
-      minLength: 4,
-    },
-    {
-      title: "This is number",
-      description: "Some description",
-      isRequired: false,
-      inputType: "number",
-      maxValue: 564,
-      minValue: -8,
-    },
-    {
-      title: "This is option",
-      description: "Some description",
-      isRequired: false,
-      inputType: "options",
-      options: [
-        {
-          label: "Option 1",
-          value: "Option 1",
-        },
-        {
-          label: "Option 2",
-          value: "Option 2",
-        },
-        {
-          label: "Option 3",
-          value: "Option 3",
-        },
-        {
-          label: "Option 4",
-          value: "Option 4",
-        },
-      ],
-    },
-  ]);
-
+      id: string;
+      data: BuilderFormData[];
+    }[]
+  >([]);
   const [viewMode, setViewMode] = useState<"builder" | "preview">("builder");
+  const [isLoading, setIsLoading] = useState(true);
 
   const toggleViewMode = useCallback(() => {
     setViewMode((prev) => (prev === "builder" ? "preview" : "builder"));
   }, []);
+
+  const handleBuilderFormDataSubmit = useCallback(
+    async (data: BuilderFormData, schemaId?: string, questionId?: number) => {
+      try {
+        if (schemaId && questionId) {
+          const updatedData = await updateSchema(data, schemaId, questionId);
+          setBuilderFormSchema(updatedData);
+          return;
+        }
+        await addSchema([data], schemaId);
+        const updatedData = await getSchemas();
+        setBuilderFormSchema(updatedData);
+      } catch (e) {
+        // TODO : Error handling
+      }
+    },
+    [],
+  );
+
+  const handleQuestionRemove = useCallback(
+    async (schemaId: string, questionId: number) => {
+      await deleteQuestionFromSchema(schemaId, questionId);
+      const updatedData = await getSchemas();
+      setBuilderFormSchema(updatedData);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    getSchemas()
+      .then((schemas) => {
+        setBuilderFormSchema(schemas);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        // TODO : Error handling
+      });
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <main className="mx-auto flex max-w-screen-xl flex-col p-6">
@@ -68,11 +80,15 @@ function App() {
       </Button>
       {viewMode === "builder" ? (
         <Builder
-          builderFormData={builderFormData}
-          setBuilderFormData={setBuilderFormData}
+          onQuestionRemove={handleQuestionRemove}
+          // We as of now only support one form
+          builderFormData={builderFormSchema[0].data}
+          onSubmit={handleBuilderFormDataSubmit}
+          schemaId={builderFormSchema[0].id}
+          onChange={handleBuilderFormDataSubmit}
         />
       ) : (
-        <Renderer schema={builderFormData} />
+        <Renderer schema={builderFormSchema[0].data} />
       )}
     </main>
   );
