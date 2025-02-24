@@ -22,13 +22,14 @@ const AUTO_SAVE_STATUS = {
 
 export interface BuilderProps {
   builderFormData: BuilderFormData[];
-  onSubmit: () => Promise<void>;
+  draftEntry: BuilderFormData | null;
+  onSubmit: (data: BuilderFormData, schemaId?: string) => Promise<void>;
   onChange: (
     data: BuilderFormData,
     isNewEntry: boolean,
     schemaId?: string,
     questionId?: number,
-  ) => Promise<void>;
+  ) => void;
   onQuestionRemove: (schemaId: string, questionId: number) => Promise<void>;
   schemaId?: string;
 }
@@ -42,16 +43,19 @@ function Builder(props: BuilderProps) {
   const { builderFormData, onSubmit, schemaId, onQuestionRemove, onChange } =
     props;
 
-  const onSuccessfulAddOrUpdate = useCallback(async () => {
-    await onSubmit();
-    setShowBuilderForm(false);
-  }, [onSubmit]);
+  const onSuccessfulAddOrUpdate = useCallback(
+    async (data: BuilderFormData) => {
+      await onSubmit(data, schemaId);
+      setShowBuilderForm(false);
+    },
+    [onSubmit, schemaId],
+  );
 
-  const onAddMore = useCallback(() => {
+  const onAddMoreQuestion = useCallback(() => {
     setShowBuilderForm(true);
   }, []);
 
-  const onRemove = useCallback(
+  const onRemoveQuestion = useCallback(
     async (questionId: number) => {
       setIsRemoveInProgress(true);
       await onQuestionRemove(schemaId!, questionId);
@@ -61,9 +65,14 @@ function Builder(props: BuilderProps) {
   );
 
   const onSuccessfulChange = useCallback(
-    async (data: BuilderFormData, isNewEntry?: boolean, inputId?: number) => {
+    async (
+      data: BuilderFormData,
+      isNewEntry?: boolean,
+      questionId?: number,
+    ) => {
       setAutoSaveStatus(AUTO_SAVE_STATUS.LOADING);
-      await onChange(data, isNewEntry ?? false, schemaId, inputId);
+      await onChange(data, isNewEntry ?? false, schemaId, questionId);
+
       setAutoSaveStatus(AUTO_SAVE_STATUS.SAVED);
     },
     [onChange, schemaId],
@@ -101,7 +110,7 @@ function Builder(props: BuilderProps) {
                     <Button
                       intent={INTENT.icon}
                       color={COLOR.error}
-                      onClick={() => onRemove(index)}
+                      onClick={() => onRemoveQuestion(index)}
                       disabled={isRemoveInProgress}
                     >
                       {isRemoveInProgress ? (
@@ -127,17 +136,28 @@ function Builder(props: BuilderProps) {
           <Button
             color={COLOR.primary}
             intent={INTENT.primary}
-            onClick={onAddMore}
+            onClick={onAddMoreQuestion}
           >
             Add more
           </Button>
         )}
         {(!builderFormData.length || showBuilderForm) && (
-          <Form
-            onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate}
-            onSuccessfulChange={onSuccessfulChange}
-            isNewEntry
-          />
+          <>
+            <div className="flex justify-end">
+              {autoSaveStatus === AUTO_SAVE_STATUS.LOADING && (
+                <LoaderCircle className="animate-spin text-color-primary" />
+              )}
+              {autoSaveStatus === AUTO_SAVE_STATUS.SAVED && (
+                <BadgeCheck className="fade-away text-color-success" />
+              )}
+            </div>
+            <Form
+              onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate}
+              onSuccessfulChange={onSuccessfulChange}
+              isNewEntry
+              initialState={props.draftEntry ?? undefined}
+            />
+          </>
         )}
       </div>
     </div>
