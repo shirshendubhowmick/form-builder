@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
 import Button, { COLOR, INTENT, SIZE } from "./components/Button/Button";
 import { BuilderFormData } from "./schemas/builder";
@@ -50,14 +51,9 @@ function App() {
         // New entry case
         if (isNewEntry) {
           await createDraftEntry(data);
-          return;
         }
-
-        const updatedData = await getSchemas();
-        await deleteDraftEntry();
-        setBuilderFormSchema(updatedData);
       } catch (e) {
-        // TODO : Error handling
+        toast.error("Something went wrong while saving data");
       }
     },
     [],
@@ -65,19 +61,28 @@ function App() {
 
   const handleBuilderFormSubmit = useCallback(
     async (data: BuilderFormData, schemaId?: string) => {
-      await addSchema([data], schemaId);
-      const promises = await Promise.all([getSchemas(), deleteDraftEntry()]);
-      setBuilderFormSchema(promises[0]);
-      setInitialDraftEntry(null);
+      try {
+        await addSchema([data], schemaId);
+        const promises = await Promise.all([getSchemas(), deleteDraftEntry()]);
+        setBuilderFormSchema(promises[0]);
+        setInitialDraftEntry(null);
+        toast.success("Question added successfully");
+      } catch (e) {
+        toast.error("Something went wrong while adding question");
+      }
     },
     [],
   );
 
   const handleQuestionRemove = useCallback(
     async (schemaId: string, questionId: number) => {
-      await deleteQuestionFromSchema(schemaId, questionId);
-      const updatedData = await getSchemas();
-      setBuilderFormSchema(updatedData);
+      try {
+        await deleteQuestionFromSchema(schemaId, questionId);
+        const updatedData = await getSchemas();
+        setBuilderFormSchema(updatedData);
+      } catch (e) {
+        toast.error("Something went wrong while removing question");
+      }
     },
     [],
   );
@@ -92,8 +97,7 @@ function App() {
         setIsLoading(false);
       })
       .catch(() => {
-        // TODO : Error handling
-        console.log("Error fetching data");
+        toast.error("Something went wrong while loading data");
       });
   }, []);
 
@@ -102,31 +106,34 @@ function App() {
   }
 
   return (
-    <main className="mx-auto flex max-w-screen-xl flex-col p-6">
-      <Button
-        color={COLOR.primary}
-        intent={INTENT.secondary}
-        size={SIZE.md}
-        onClick={toggleViewMode}
-        className="self-end"
-        disabled={!builderFormSchema}
-      >
-        Switch to {viewMode === "builder" ? "Preview" : "Builder"}
-      </Button>
-      {viewMode === "builder" ? (
-        <Builder
-          onQuestionRemove={handleQuestionRemove}
-          // We as of now only support one form
-          builderFormData={builderFormSchema?.[0].data ?? []}
-          onSubmit={handleBuilderFormSubmit}
-          schemaId={builderFormSchema?.[0].id}
-          onChange={handleBuilderFormDataChange}
-          draftEntry={initialDraftEntry}
-        />
-      ) : (
-        <Renderer schema={builderFormSchema?.[0].data!} />
-      )}
-    </main>
+    <>
+      <main className="mx-auto flex max-w-screen-xl flex-col p-6">
+        <Button
+          color={COLOR.primary}
+          intent={INTENT.secondary}
+          size={SIZE.md}
+          onClick={toggleViewMode}
+          className="self-end"
+          disabled={!builderFormSchema}
+        >
+          Switch to {viewMode === "builder" ? "Preview" : "Builder"}
+        </Button>
+        {viewMode === "builder" ? (
+          <Builder
+            onQuestionRemove={handleQuestionRemove}
+            // We as of now only support one form
+            builderFormData={builderFormSchema?.[0].data ?? []}
+            onSubmit={handleBuilderFormSubmit}
+            schemaId={builderFormSchema?.[0].id}
+            onChange={handleBuilderFormDataChange}
+            draftEntry={initialDraftEntry}
+          />
+        ) : (
+          <Renderer schema={builderFormSchema?.[0].data!} />
+        )}
+      </main>
+      <ToastContainer position="top-right" autoClose={2000} />
+    </>
   );
 }
 
