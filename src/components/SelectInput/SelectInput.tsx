@@ -18,6 +18,7 @@ export interface SelectInputProps<T extends string> {
   label?: string;
   error?: string | null;
   disabled?: boolean;
+  containerClassName?: string;
 }
 function SelectInput<T extends string>(props: SelectInputProps<T>) {
   const sanitizedValue = useMemo(() => {
@@ -32,7 +33,7 @@ function SelectInput<T extends string>(props: SelectInputProps<T>) {
   }, [props.options, props.value]);
 
   return (
-    <Label className="inline-block">
+    <Label className={twMerge("inline-block", props.containerClassName)}>
       {Boolean(props.label) && (
         <span className="mb-2 block">{props.label}</span>
       )}
