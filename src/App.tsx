@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
 import Button, { COLOR, INTENT, SIZE } from "./components/Button/Button";
+import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 import { BuilderFormData } from "./schemas/builder";
 import {
   addSchema,
@@ -27,6 +28,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [initialDraftEntry, setInitialDraftEntry] =
     useState<BuilderFormData | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   const toggleViewMode = useCallback(() => {
     setViewMode((prev) => (prev === "builder" ? "preview" : "builder"));
@@ -97,44 +99,55 @@ function App() {
         setIsLoading(false);
       })
       .catch(() => {
-        toast.error("Something went wrong while loading data");
+        toast.error("Something went wrong while fetching data");
+        setHasError(true);
       });
   }, []);
+
+  if (hasError) {
+    throw new Error("Unabele to load data");
+  }
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <>
-      <main className="mx-auto flex max-w-screen-xl flex-col p-6">
-        <Button
-          color={COLOR.primary}
-          intent={INTENT.secondary}
-          size={SIZE.md}
-          onClick={toggleViewMode}
-          className="self-end"
-          disabled={!builderFormSchema}
-        >
-          Switch to {viewMode === "builder" ? "Preview" : "Builder"}
-        </Button>
-        {viewMode === "builder" ? (
-          <Builder
-            onQuestionRemove={handleQuestionRemove}
-            // We as of now only support one form
-            builderFormData={builderFormSchema?.[0].data ?? []}
-            onSubmit={handleBuilderFormSubmit}
-            schemaId={builderFormSchema?.[0].id}
-            onChange={handleBuilderFormDataChange}
-            draftEntry={initialDraftEntry}
-          />
-        ) : (
-          <Renderer schema={builderFormSchema?.[0].data!} />
-        )}
-      </main>
-      <ToastContainer position="top-right" autoClose={2000} />
-    </>
+    <main className="mx-auto flex max-w-screen-xl flex-col p-6">
+      <Button
+        color={COLOR.primary}
+        intent={INTENT.secondary}
+        size={SIZE.md}
+        onClick={toggleViewMode}
+        className="self-end"
+        disabled={!builderFormSchema}
+      >
+        Switch to {viewMode === "builder" ? "Preview" : "Builder"}
+      </Button>
+      {viewMode === "builder" ? (
+        <Builder
+          onQuestionRemove={handleQuestionRemove}
+          // We as of now only support one form
+          builderFormData={builderFormSchema?.[0].data ?? []}
+          onSubmit={handleBuilderFormSubmit}
+          schemaId={builderFormSchema?.[0].id}
+          onChange={handleBuilderFormDataChange}
+          draftEntry={initialDraftEntry}
+        />
+      ) : (
+        <Renderer schema={builderFormSchema?.[0].data!} />
+      )}
+    </main>
   );
 }
 
-export default App;
+function Root() {
+  return (
+    <ErrorBoundary>
+      <App />
+      <ToastContainer position="top-right" autoClose={2000} />
+    </ErrorBoundary>
+  );
+}
+
+export default Root;
