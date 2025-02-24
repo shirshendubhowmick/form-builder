@@ -12,9 +12,10 @@ import InputMetaInfo from "../InputMetaInfo/InputMetaInfo";
 import { parseFormData } from "./util";
 
 export interface BuilderFormProps {
-  onSuccessfulAddOrUpdate: (data: BuilderFormData, formId?: number) => void;
+  onSuccessfulAddOrUpdate: (data: BuilderFormData, questionId?: number) => void;
+  onSuccessfulChange: (data: BuilderFormData, questionId?: number) => void;
   initialState?: BuilderFormData;
-  formId?: number;
+  questionId?: number;
 }
 
 function Form(props: BuilderFormProps) {
@@ -24,7 +25,7 @@ function Form(props: BuilderFormProps) {
   const [errorMessages, setErrorMessages] = useState<ErrorMessages>({});
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { onSuccessfulAddOrUpdate, formId } = props;
+  const { onSuccessfulAddOrUpdate, questionId, onSuccessfulChange } = props;
 
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -34,7 +35,7 @@ function Form(props: BuilderFormProps) {
       const { data, errorMessages: errors } = parseFormData(formData);
 
       if (data) {
-        onSuccessfulAddOrUpdate(data, formId);
+        onSuccessfulAddOrUpdate(data, questionId);
         return;
       }
 
@@ -42,13 +43,22 @@ function Form(props: BuilderFormProps) {
         setErrorMessages(errors);
       }
     },
-    [formId, onSuccessfulAddOrUpdate],
+    [questionId, onSuccessfulAddOrUpdate],
   );
 
   const onChange = useCallback(() => {
     const formData = new FormData(formRef.current!);
-    console.log("formData", Object.fromEntries(formData.entries()));
-  }, []);
+    const { data, errorMessages: errors } = parseFormData(formData);
+
+    if (data) {
+      onSuccessfulChange(data, questionId);
+      return;
+    }
+
+    if (errors) {
+      setErrorMessages(errors);
+    }
+  }, [questionId, onSuccessfulChange]);
 
   const debouncedOnChange = useMemo(() => debounce(onChange, 1000), [onChange]);
 
@@ -99,11 +109,11 @@ function Form(props: BuilderFormProps) {
           initialState={props.initialState}
         />
       )}
-      {typeof props.formId !== "undefined" && (
-        <input type="hidden" value={props.formId} name="formId" />
+      {typeof props.questionId !== "undefined" && (
+        <input type="hidden" value={props.questionId} name="formId" />
       )}
       <Button type="submit" intent={INTENT.primary} color={COLOR.primary}>
-        {typeof props.formId === "undefined" ? "Add" : "Update"}
+        {typeof props.questionId === "undefined" ? "Add" : "Update"}
       </Button>
     </form>
   );
