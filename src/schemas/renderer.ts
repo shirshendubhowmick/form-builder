@@ -1,0 +1,95 @@
+import z, { ZodError, ZodNumber, ZodOptional } from "zod";
+
+import { BuilderFormData } from "./builder";
+
+function getValidationSchemaFromFormSchema(builderSchema: BuilderFormData[]) {
+  let schema = z.object({});
+
+  builderSchema.forEach((question, idx) => {
+    switch (question.inputType) {
+      case "text":
+        {
+          const textSchema = z.string();
+
+          schema = schema.extend({
+            [`text-${idx}`]: question.isRequired
+              ? textSchema.min(question.minLength).max(question.maxLength)
+              : textSchema
+                  .transform((v) => v || undefined)
+                  .nullable()
+                  .optional(),
+          });
+        }
+        break;
+      case "number":
+        {
+          const numberSchema = z.string().transform((v) => {
+            return Number(v);
+          });
+
+          let ns: ZodNumber | ZodOptional<ZodNumber> = z.number();
+          if (question.minValue !== null) {
+            ns = ns.min(question.minValue);
+          }
+          if (question.maxValue !== null) {
+            ns = ns.max(question.maxValue);
+          }
+          if (!question.isRequired) {
+            ns = ns.optional();
+          }
+          schema = schema.extend({
+            [`number-${idx}`]: numberSchema.pipe(ns),
+          });
+        }
+        break;
+      case "options":
+        {
+          const x = question.options.map((option) => z.literal(option.value));
+          const optionsSchema = z
+            .string()
+            .transform((v) => {
+              if (!v) {
+                return undefined;
+              }
+              return v;
+            })
+            .pipe(
+              z.union(
+                x as unknown as readonly [
+                  z.ZodTypeAny,
+                  z.ZodTypeAny,
+                  ...z.ZodTypeAny[],
+                ],
+              ),
+            );
+          schema = schema.extend({
+            [`select-${idx}`]: question.isRequired
+              ? optionsSchema
+              : optionsSchema.nullable().optional(),
+          });
+        }
+        break;
+      default:
+    }
+  });
+
+  return schema;
+}
+
+export default getValidationSchemaFromFormSchema;
+
+export function getValidationErrors(error: ZodError): Record<string, string> {
+  if (!(error instanceof ZodError)) {
+    return {};
+  }
+
+  const errorMessages = error.issues.reduce(
+    (acc, issue) => {
+      acc[issue.path[0] as string] = issue.message as string;
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+
+  return errorMessages;
+}
