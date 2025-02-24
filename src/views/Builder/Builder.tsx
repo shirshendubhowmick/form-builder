@@ -153,7 +153,7 @@ function Builder(props: BuilderProps) {
         )}
         {shouldShowNewQuestiopnForm && (
           <>
-            <div className="flex justify-end">
+            <div className="flex min-h-6 justify-end">
               {autoSaveStatus === AUTO_SAVE_STATUS.LOADING && (
                 <LoaderCircle className="animate-spin text-color-primary" />
               )}
