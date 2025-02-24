@@ -132,6 +132,7 @@ function InputMetaInfo(props: InputMetaInfoProps) {
                 color={COLOR.error}
                 disabled={optionIds.length === 1}
                 onClick={() => handleRemoveOption(item.id)}
+                className="mb-4"
               >
                 <Trash2 />
               </Button>
