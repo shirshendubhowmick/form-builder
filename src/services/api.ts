@@ -9,10 +9,14 @@ function randomIsError(trueProbability: number): boolean {
   return Math.random() < probability;
 }
 
+export type Schemas = Record<string, BuilderFormData[]>;
+
+const LOCAL_STORAGE_SCHEMA_KEY = "schema";
+
 export async function addQuestion(
   inputSchemas: BuilderFormData[],
   schemaId?: number,
-): Promise<{ id: number }> {
+): Promise<{ schemaId: string; lastInsertedInputId: number }> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (randomIsError(errorProbability)) {
@@ -22,15 +26,18 @@ export async function addQuestion(
 
       if (schemaId) {
         try {
-          const existingData = localStorage.getItem(`schema`);
+          const existingData = localStorage.getItem(LOCAL_STORAGE_SCHEMA_KEY);
           if (existingData) {
-            const parsedData = JSON.parse(existingData);
-            const updatedData = parsedData[schemaId].concat(inputSchemas);
+            const parsedData = JSON.parse(existingData) as Schemas;
+            parsedData[schemaId] = parsedData[schemaId].concat(inputSchemas);
             localStorage.setItem(
-              `schema:${schemaId}`,
-              JSON.stringify(updatedData),
+              LOCAL_STORAGE_SCHEMA_KEY,
+              JSON.stringify(parsedData),
             );
-            resolve({ id: schemaId });
+            resolve({
+              schemaId: String(schemaId),
+              lastInsertedInputId: parsedData[schemaId].length - 1,
+            });
             return;
           }
           reject(new Error(`Schema with ${schemaId} not found`));
@@ -42,8 +49,14 @@ export async function addQuestion(
 
       try {
         const id = new Date().getTime();
-        localStorage.setItem(`schema`, JSON.stringify({ [id]: inputSchemas }));
-        resolve({ id });
+        localStorage.setItem(
+          LOCAL_STORAGE_SCHEMA_KEY,
+          JSON.stringify({ [id]: inputSchemas }),
+        );
+        resolve({
+          schemaId: String(id),
+          lastInsertedInputId: inputSchemas.length,
+        });
       } catch (e) {
         reject(e);
       }
@@ -63,12 +76,12 @@ export async function updateQuestion(
         return;
       }
       try {
-        const existingData = localStorage.getItem(`schema`);
+        const existingData = localStorage.getItem(LOCAL_STORAGE_SCHEMA_KEY);
         if (existingData) {
-          const parsedData = JSON.parse(existingData);
+          const parsedData = JSON.parse(existingData) as Schemas;
           parsedData[schemaId][inputId] = inputSchema;
           localStorage.setItem(
-            `schema:${schemaId}`,
+            LOCAL_STORAGE_SCHEMA_KEY,
             JSON.stringify(parsedData),
           );
           resolve();
