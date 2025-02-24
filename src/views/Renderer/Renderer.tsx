@@ -89,20 +89,22 @@ function Renderer(props: RendererProps) {
   return (
     <div>
       <h1 className="mb-8">Preview</h1>
-      <form onSubmit={onSubmit} className="flex flex-col">
-        {props.schema.map((input, index) => (
-          <FormInputs
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
-            inputInfo={input}
-            index={index}
-            errorMessages={errorMessages}
-          />
-        ))}
-        <Button type="submit" intent={INTENT.primary} color={COLOR.primary}>
-          Submit
-        </Button>
-      </form>
+      <div className="mx-auto max-w-3xl">
+        <form onSubmit={onSubmit} className="flex flex-col">
+          {props.schema.map((input, index) => (
+            <FormInputs
+              // eslint-disable-next-line react/no-array-index-key
+              key={index}
+              inputInfo={input}
+              index={index}
+              errorMessages={errorMessages}
+            />
+          ))}
+          <Button type="submit" intent={INTENT.primary} color={COLOR.primary}>
+            Submit
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
