@@ -26,7 +26,7 @@ function FormInputs(props: FormInputsProps) {
           label={props.inputInfo.title}
           placeholder={props.inputInfo.description ?? undefined}
           name={`text-${props.index}`}
-          className="mb-4"
+          containerClassName="mb-4"
           error={props.errorMessages[`text-${props.index}`]}
         />
       );
@@ -37,7 +37,7 @@ function FormInputs(props: FormInputsProps) {
           placeholder={props.inputInfo.description ?? undefined}
           type="number"
           name={`number-${props.index}`}
-          className="mb-4"
+          containerClassName="mb-4"
           error={props.errorMessages[`number-${props.index}`]}
         />
       );

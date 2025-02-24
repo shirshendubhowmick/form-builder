@@ -86,7 +86,7 @@ function Form(props: BuilderFormProps) {
         label="Question title"
         placeholder="What is your name ?"
         name="title"
-        className="mb-4"
+        containerClassName="mb-4"
         error={errorMessages.title}
         defaultValue={props.initialState?.title}
       />
@@ -94,7 +94,7 @@ function Form(props: BuilderFormProps) {
         label="Question description"
         placeholder="Type your question here"
         name="description"
-        className="mb-4"
+        containerClassName="mb-4"
         error={errorMessages.description}
         defaultValue={props.initialState?.description ?? undefined}
       />
