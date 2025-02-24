@@ -39,14 +39,17 @@ function Builder(props: BuilderProps) {
     ValueOf<typeof AUTO_SAVE_STATUS>
   >(AUTO_SAVE_STATUS.IDLE);
   const [isRemoveInProgress, setIsRemoveInProgress] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { builderFormData, onSubmit, schemaId, onQuestionRemove, onChange } =
     props;
 
   const onSuccessfulAddOrUpdate = useCallback(
     async (data: BuilderFormData) => {
+      setIsSubmitting(true);
       await onSubmit(data, schemaId);
       setShowBuilderForm(false);
+      setIsSubmitting(false);
     },
     [onSubmit, schemaId],
   );
@@ -125,6 +128,7 @@ function Builder(props: BuilderProps) {
                     initialState={input}
                     questionId={index}
                     onSuccessfulChange={onSuccessfulChange}
+                    isSubmitting={false}
                   />
                 </div>
               </Accordion.Content>
@@ -132,16 +136,18 @@ function Builder(props: BuilderProps) {
           ))}
         </Accordion.Root>
 
-        {Boolean(builderFormData.length) && !showBuilderForm && (
-          <Button
-            color={COLOR.primary}
-            intent={INTENT.primary}
-            onClick={onAddMoreQuestion}
-          >
-            Add more
-          </Button>
-        )}
-        {(!builderFormData.length || showBuilderForm) && (
+        {Boolean(builderFormData.length) &&
+          !showBuilderForm &&
+          !props.draftEntry && (
+            <Button
+              color={COLOR.primary}
+              intent={INTENT.primary}
+              onClick={onAddMoreQuestion}
+            >
+              Add more
+            </Button>
+          )}
+        {(!builderFormData.length || showBuilderForm || props.draftEntry) && (
           <>
             <div className="flex justify-end">
               {autoSaveStatus === AUTO_SAVE_STATUS.LOADING && (
@@ -156,6 +162,7 @@ function Builder(props: BuilderProps) {
               onSuccessfulChange={onSuccessfulChange}
               isNewEntry
               initialState={props.draftEntry ?? undefined}
+              isSubmitting={isSubmitting}
             />
           </>
         )}
