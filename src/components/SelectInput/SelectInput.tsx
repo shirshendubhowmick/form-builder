@@ -88,9 +88,7 @@ function SelectInput<T extends string>(props: SelectInputProps<T>) {
           </Select.ScrollDownButton>
         </Select.Content>
       </Select.Root>
-      {Boolean(props.error) && (
-        <span className="text-color-error">{props.error}</span>
-      )}
+      <span className="min-h-4 text-color-error">{props.error ?? ""}</span>
     </Label>
   );
 }

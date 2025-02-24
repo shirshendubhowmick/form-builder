@@ -26,9 +26,7 @@ function Input(props: InputProps) {
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...otherProps}
       />
-      {Boolean(props.error) && (
-        <span className="text-color-error">{props.error}</span>
-      )}
+      <span className="min-h-4 text-color-error">{props.error ?? ""}</span>
     </label>
   );
 }
