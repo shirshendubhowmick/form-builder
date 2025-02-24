@@ -85,7 +85,10 @@ export function getValidationErrors(error: ZodError): Record<string, string> {
 
   const errorMessages = error.issues.reduce(
     (acc, issue) => {
-      acc[issue.path[0] as string] = issue.message as string;
+      acc[issue.path[0] as string] =
+        issue.message === "Invalid input"
+          ? "This field is required"
+          : (issue.message as string);
       return acc;
     },
     {} as Record<string, string>,
