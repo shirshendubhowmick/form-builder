@@ -113,34 +113,51 @@ function App() {
     throw new Error("Unabele to load data");
   }
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <main className="mx-auto flex max-w-screen-xl flex-col p-6">
-      <Button
-        color={COLOR.primary}
-        intent={INTENT.secondary}
-        size={SIZE.md}
-        onClick={toggleViewMode}
-        className="self-end"
-        disabled={!builderFormSchema}
-      >
-        Switch to {viewMode === "builder" ? "Preview" : "Builder"}
-      </Button>
-      {viewMode === "builder" ? (
-        <Builder
-          onQuestionRemove={handleQuestionRemove}
-          // We as of now only support one form
-          builderFormData={builderFormSchema?.[0].data ?? []}
-          onSubmit={handleBuilderFormSubmit}
-          schemaId={builderFormSchema?.[0].id}
-          onChange={handleBuilderFormDataChange}
-          draftEntry={initialDraftEntry}
-        />
+      {isLoading ? (
+        <div>
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+          <div className="mb-4 h-12 w-full animate-pulse rounded bg-color-background" />
+        </div>
       ) : (
-        <Renderer schema={builderFormSchema?.[0].data!} />
+        <>
+          <Button
+            color={COLOR.primary}
+            intent={INTENT.secondary}
+            size={SIZE.md}
+            onClick={toggleViewMode}
+            className="self-end"
+            disabled={!builderFormSchema}
+          >
+            Switch to {viewMode === "builder" ? "Preview" : "Builder"}
+          </Button>
+          {viewMode === "builder" ? (
+            <Builder
+              onQuestionRemove={handleQuestionRemove}
+              // We as of now only support one form
+              builderFormData={builderFormSchema?.[0].data ?? []}
+              onSubmit={handleBuilderFormSubmit}
+              schemaId={builderFormSchema?.[0].id}
+              onChange={handleBuilderFormDataChange}
+              draftEntry={initialDraftEntry}
+            />
+          ) : (
+            <Renderer schema={builderFormSchema?.[0].data!} />
+          )}
+        </>
       )}
     </main>
   );
