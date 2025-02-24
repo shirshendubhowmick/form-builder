@@ -105,13 +105,13 @@ function Form(props: BuilderFormProps) {
           name="inputType"
           ariaLabel="Input type"
           onValueChange={setInputType}
-          className="mr-8"
+          className="mr-2"
           defaultValue={props.initialState?.inputType || INPUT_TYPES[0].value}
         />
         <Checkbox
           name="isRequired"
           label="Required ?"
-          className="mt-4"
+          className="mt-6"
           defaulChecked={props.initialState?.isRequired}
         />
       </div>
