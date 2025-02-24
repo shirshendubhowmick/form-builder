@@ -1,9 +1,12 @@
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import Button, { COLOR, INTENT } from "~/components/Button/Button";
 import Input from "~/components/Input/Input";
 import SelectInput from "~/components/SelectInput/SelectInput";
 import { BuilderFormData } from "~/schemas/builder";
+import getValidationSchemaFromFormSchema from "~/schemas/renderer";
+
+import { parseFormData } from "./utils";
 
 export interface RendererProps {
   schema: BuilderFormData[];
@@ -12,6 +15,7 @@ export interface RendererProps {
 interface FormInputsProps {
   inputInfo: BuilderFormData;
   index: number;
+  errorMessages: Record<string, string>;
 }
 
 function FormInputs(props: FormInputsProps) {
@@ -23,6 +27,7 @@ function FormInputs(props: FormInputsProps) {
           placeholder={props.inputInfo.description ?? undefined}
           name={`text-${props.index}`}
           className="mb-4"
+          error={props.errorMessages[`text-${props.index}`]}
         />
       );
     case "number":
@@ -33,6 +38,7 @@ function FormInputs(props: FormInputsProps) {
           type="number"
           name={`number-${props.index}`}
           className="mb-4"
+          error={props.errorMessages[`number-${props.index}`]}
         />
       );
     case "options":
@@ -43,6 +49,7 @@ function FormInputs(props: FormInputsProps) {
           options={props.inputInfo.options}
           ariaLabel={props.inputInfo.title}
           className="mb-4"
+          error={props.errorMessages[`select-${props.index}`]}
         />
       );
     default:
@@ -51,19 +58,45 @@ function FormInputs(props: FormInputsProps) {
 }
 
 function Renderer(props: RendererProps) {
-  const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // const formData = new FormData(e.currentTarget);
-    // const data = Object.fromEntries(formData.entries());
-  }, []);
+  const [errorMessages, setErrorMessages] = useState<Record<string, string>>(
+    {},
+  );
+
+  const validationSchema = useMemo(() => {
+    return getValidationSchemaFromFormSchema(props.schema);
+  }, [props.schema]);
+
+  const onSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.currentTarget);
+      const result = parseFormData(formData, validationSchema);
+
+      if (result.data) {
+        console.log(result.data);
+        return;
+      }
+
+      if (result.errorMessages) {
+        setErrorMessages(result.errorMessages);
+      }
+    },
+    [validationSchema],
+  );
 
   return (
     <div>
       <h1 className="mb-8">Preview</h1>
       <form onSubmit={onSubmit} className="flex flex-col">
         {props.schema.map((input, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <FormInputs key={index} inputInfo={input} index={index} />
+          <FormInputs
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+            inputInfo={input}
+            index={index}
+            errorMessages={errorMessages}
+          />
         ))}
         <Button type="submit" intent={INTENT.primary} color={COLOR.primary}>
           Submit
