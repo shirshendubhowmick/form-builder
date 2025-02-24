@@ -50,6 +50,7 @@ function FormInputs(props: FormInputsProps) {
           ariaLabel={props.inputInfo.title}
           className="mb-4"
           error={props.errorMessages[`select-${props.index}`]}
+          containerClassName="mb-4"
         />
       );
     default:
