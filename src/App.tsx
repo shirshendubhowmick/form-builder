@@ -25,23 +25,39 @@ function App() {
     setViewMode((prev) => (prev === "builder" ? "preview" : "builder"));
   }, []);
 
-  const handleBuilderFormDataSubmit = useCallback(
-    async (data: BuilderFormData, schemaId?: string, questionId?: number) => {
+  const handleBuilderFormDataChange = useCallback(
+    async (
+      data: BuilderFormData,
+      isNewEntry: boolean,
+      schemaId?: string,
+      questionId?: number,
+    ) => {
       try {
         if (schemaId && questionId) {
           const updatedData = await updateSchema(data, schemaId, questionId);
-          setBuilderFormSchema(updatedData);
+          if (!isNewEntry) {
+            setBuilderFormSchema(updatedData);
+          }
+
           return;
         }
         await addSchema([data], schemaId);
-        const updatedData = await getSchemas();
-        setBuilderFormSchema(updatedData);
+        if (!isNewEntry) {
+          const updatedData = await getSchemas();
+          setBuilderFormSchema(updatedData);
+        }
       } catch (e) {
         // TODO : Error handling
       }
     },
     [],
   );
+
+  const handleBuilderFormSubmit = useCallback(async () => {
+    const data = await getSchemas();
+    setIsLoading(false);
+    setBuilderFormSchema(data);
+  }, []);
 
   const handleQuestionRemove = useCallback(
     async (schemaId: string, questionId: number) => {
@@ -83,9 +99,9 @@ function App() {
           onQuestionRemove={handleQuestionRemove}
           // We as of now only support one form
           builderFormData={builderFormSchema[0].data}
-          onSubmit={handleBuilderFormDataSubmit}
+          onSubmit={handleBuilderFormSubmit}
           schemaId={builderFormSchema[0].id}
-          onChange={handleBuilderFormDataSubmit}
+          onChange={handleBuilderFormDataChange}
         />
       ) : (
         <Renderer schema={builderFormSchema[0].data} />
