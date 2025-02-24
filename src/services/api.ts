@@ -129,3 +129,36 @@ export async function getSchemas(): Promise<Schema[]> {
     }, delayInMs);
   });
 }
+
+export async function deleteQuestionFromSchema(
+  schemaId: string,
+  questionId: number,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (randomIsError(errorProbability)) {
+        reject(new Error("Failed to add question"));
+        return;
+      }
+      try {
+        const existingData = localStorage.getItem(LOCAL_STORAGE_SCHEMA_KEY);
+        if (existingData) {
+          const parsedData = JSON.parse(existingData) as SchemaStorage;
+          const updatedData = parsedData[schemaId].filter(
+            (_, idx) => idx !== questionId,
+          );
+          parsedData[schemaId] = updatedData;
+          localStorage.setItem(
+            LOCAL_STORAGE_SCHEMA_KEY,
+            JSON.stringify(parsedData),
+          );
+          resolve();
+          return;
+        }
+        reject(new Error(`Schema with ${schemaId} not found`));
+      } catch (e) {
+        reject(e);
+      }
+    }, delayInMs);
+  });
+}
