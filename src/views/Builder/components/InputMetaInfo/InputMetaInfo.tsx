@@ -55,12 +55,13 @@ function InputMetaInfo(props: InputMetaInfoProps) {
   switch (props.type) {
     case "text":
       return (
-        <div className="mb-8 inline-block">
+        <div className="mb-8 inline-flex flex-col">
           <Input
             label="Minimum length"
             placeholder="3"
             name="minLength"
-            className="mr-8"
+            containerClassName="mb-4 mr-8 w-full"
+            className="w-1/4"
             type="number"
             error={props.errorMessages.minLength}
             defaultValue={
@@ -76,6 +77,8 @@ function InputMetaInfo(props: InputMetaInfoProps) {
             defaultValue={
               (props.initialState as BuilderFormTextInputData)?.maxLength
             }
+            containerClassName="mb-4 mr-8 w-full"
+            className="w-1/4"
           />
         </div>
       );
@@ -86,7 +89,8 @@ function InputMetaInfo(props: InputMetaInfoProps) {
             label="Minimum value"
             placeholder="720"
             name="minValue"
-            className="mr-8"
+            containerClassName="mb-4 mr-8 w-full"
+            className="w-1/4"
             type="number"
             error={props.errorMessages.minValue}
             defaultValue={
@@ -104,6 +108,8 @@ function InputMetaInfo(props: InputMetaInfoProps) {
               (props.initialState as BuilderFormNumberInputData)?.maxValue ??
               undefined
             }
+            containerClassName="mb-4 mr-8 w-full"
+            className="w-1/4"
           />
         </div>
       );
@@ -116,7 +122,7 @@ function InputMetaInfo(props: InputMetaInfoProps) {
                 label={`Option ${idx + 1}`}
                 placeholder="Lorem"
                 name={`option-${item.id}`}
-                className="mb-4 mr-4"
+                containerClassName="mb-4 mr-4"
                 error={props.errorMessages.options?.[item.id]}
                 defaultValue={item.defaultValue}
               />
