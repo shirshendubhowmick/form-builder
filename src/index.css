@@ -15,7 +15,7 @@
   }
 
   body {
-    @apply text-color-normal text-base;
+    @apply text-base text-color-normal;
   }
 
   h1 {
@@ -28,5 +28,19 @@
 
   h3 {
     @apply text-2xl font-medium;
+  }
+}
+
+.fade-away {
+  animation: fade-away 4s ease-in-out forwards;
+}
+
+@keyframes fade-away {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
   }
 }
