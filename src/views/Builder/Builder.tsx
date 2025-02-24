@@ -1,36 +1,55 @@
 import * as Accordion from "@radix-ui/react-accordion";
-import { ChevronDownIcon, Trash2 } from "lucide-react";
+import {
+  BadgeCheck,
+  ChevronDownIcon,
+  LoaderCircle,
+  Trash2,
+} from "lucide-react";
 import { useCallback, useState } from "react";
 
 import Button, { COLOR, INTENT } from "~/components/Button/Button";
 import { DEBUG_MODE } from "~/constants";
 import { BuilderFormData } from "~/schemas/builder";
+import { ValueOf } from "~/types";
 
 import Form from "./components/Form/Form";
 
+const AUTO_SAVE_STATUS = {
+  SAVED: "s",
+  LOADING: "l",
+  IDLE: "i",
+} as const;
+
 export interface BuilderProps {
   builderFormData: BuilderFormData[];
-  setBuilderFormData: React.Dispatch<React.SetStateAction<BuilderFormData[]>>;
+  onSubmit: (
+    data: BuilderFormData,
+    schemaId?: string,
+    questionId?: number,
+  ) => Promise<void>;
+  onChange: (
+    data: BuilderFormData,
+    schemaId?: string,
+    questionId?: number,
+  ) => Promise<void>;
+  onQuestionRemove: (inputId: number, formId: string) => void;
+  schemaId?: string;
 }
 function Builder(props: BuilderProps) {
   const [showBuilderForm, setShowBuilderForm] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<
+    ValueOf<typeof AUTO_SAVE_STATUS>
+  >(AUTO_SAVE_STATUS.IDLE);
 
-  const { builderFormData, setBuilderFormData } = props;
+  const { builderFormData, onSubmit, schemaId, onQuestionRemove, onChange } =
+    props;
 
   const onSuccessfulAddOrUpdate = useCallback(
-    (data: BuilderFormData, formId?: number) => {
-      if (typeof formId === "undefined") {
-        setBuilderFormData((prev) => [...prev, data]);
-      } else {
-        setBuilderFormData((prev) => {
-          const newInputs = [...prev];
-          newInputs[formId] = data;
-          return newInputs;
-        });
-      }
+    async (data: BuilderFormData, questionId?: number) => {
+      await onSubmit(data, schemaId, questionId);
       setShowBuilderForm(false);
     },
-    [setBuilderFormData],
+    [onSubmit, schemaId],
   );
 
   const onAddMore = useCallback(() => {
@@ -38,14 +57,19 @@ function Builder(props: BuilderProps) {
   }, []);
 
   const onRemove = useCallback(
-    (formId: number) => {
-      setBuilderFormData((prev) => {
-        const newInputs = [...prev];
-        newInputs.splice(formId, 1);
-        return newInputs;
-      });
+    (inputId: number) => {
+      onQuestionRemove(inputId, schemaId!);
     },
-    [setBuilderFormData],
+    [schemaId, onQuestionRemove],
+  );
+
+  const onSuccessfulChange = useCallback(
+    async (data: BuilderFormData, inputId?: number) => {
+      setAutoSaveStatus(AUTO_SAVE_STATUS.LOADING);
+      await onChange(data, schemaId, inputId);
+      setAutoSaveStatus(AUTO_SAVE_STATUS.SAVED);
+    },
+    [onChange, schemaId],
   );
 
   return (
@@ -68,18 +92,28 @@ function Builder(props: BuilderProps) {
                   <pre className="mb-8">{JSON.stringify(input, null, 2)}</pre>
                 )}
                 <div className="flex flex-col">
-                  <Button
-                    intent={INTENT.icon}
-                    color={COLOR.error}
-                    className="self-end"
-                    onClick={() => onRemove(index)}
-                  >
-                    <Trash2 />
-                  </Button>
+                  <div className="ietms-center flex self-end">
+                    <span className="p-1">
+                      {autoSaveStatus === AUTO_SAVE_STATUS.LOADING && (
+                        <LoaderCircle className="animate-spin text-color-primary" />
+                      )}
+                      {autoSaveStatus === AUTO_SAVE_STATUS.SAVED && (
+                        <BadgeCheck className="fade-away text-color-success" />
+                      )}
+                    </span>
+                    <Button
+                      intent={INTENT.icon}
+                      color={COLOR.error}
+                      onClick={() => onRemove(index)}
+                    >
+                      <Trash2 />
+                    </Button>
+                  </div>
                   <Form
                     onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate}
                     initialState={input}
-                    formId={index}
+                    questionId={index}
+                    onSuccessfulChange={onSuccessfulChange}
                   />
                 </div>
               </Accordion.Content>
@@ -97,7 +131,10 @@ function Builder(props: BuilderProps) {
           </Button>
         )}
         {(!builderFormData.length || showBuilderForm) && (
-          <Form onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate} />
+          <Form
+            onSuccessfulAddOrUpdate={onSuccessfulAddOrUpdate}
+            onSuccessfulChange={onSuccessfulChange}
+          />
         )}
       </div>
     </div>
