@@ -44,27 +44,27 @@ function getValidationSchemaFromFormSchema(builderSchema: BuilderFormData[]) {
         break;
       case "options":
         {
-          const x = question.options.map((option) => z.literal(option.value));
-          const optionsSchema = z
-            .string()
-            .transform((v) => {
-              if (!v) {
-                return undefined;
-              }
-              return v;
-            })
-            .pipe(
-              z.union(
-                x as unknown as readonly [
-                  z.ZodTypeAny,
-                  z.ZodTypeAny,
-                  ...z.ZodTypeAny[],
-                ],
-              ),
-            );
+          const options = question.options.map((option) =>
+            z.literal(option.value),
+          );
+          const optionsSchema = z.string().transform((v) => {
+            if (!v) {
+              return undefined;
+            }
+            return v;
+          });
+
           schema = schema.extend({
             [`select-${idx}`]: question.isRequired
-              ? optionsSchema
+              ? optionsSchema.pipe(
+                  z.union(
+                    options as unknown as readonly [
+                      z.ZodTypeAny,
+                      z.ZodTypeAny,
+                      ...z.ZodTypeAny[],
+                    ],
+                  ),
+                )
               : optionsSchema.nullable().optional(),
           });
         }
