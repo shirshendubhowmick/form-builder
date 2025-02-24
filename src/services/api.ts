@@ -22,10 +22,10 @@ export async function addQuestion(
 
       if (schemaId) {
         try {
-          const existingData = localStorage.getItem(`schema:${schemaId}`);
+          const existingData = localStorage.getItem(`schema`);
           if (existingData) {
             const parsedData = JSON.parse(existingData);
-            const updatedData = [...parsedData, ...inputSchemas];
+            const updatedData = parsedData[schemaId].concat(inputSchemas);
             localStorage.setItem(
               `schema:${schemaId}`,
               JSON.stringify(updatedData),
@@ -42,7 +42,7 @@ export async function addQuestion(
 
       try {
         const id = new Date().getTime();
-        localStorage.setItem(`schema:${id}`, JSON.stringify(inputSchemas));
+        localStorage.setItem(`schema`, JSON.stringify({ [id]: inputSchemas }));
         resolve({ id });
       } catch (e) {
         reject(e);
@@ -63,10 +63,10 @@ export async function updateQuestion(
         return;
       }
       try {
-        const existingData = localStorage.getItem(`schema:${schemaId}`);
+        const existingData = localStorage.getItem(`schema`);
         if (existingData) {
-          const parsedData = JSON.parse(existingData) as BuilderFormData[];
-          parsedData[inputId] = inputSchema;
+          const parsedData = JSON.parse(existingData);
+          parsedData[schemaId][inputId] = inputSchema;
           localStorage.setItem(
             `schema:${schemaId}`,
             JSON.stringify(parsedData),
