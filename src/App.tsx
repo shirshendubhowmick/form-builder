@@ -13,6 +13,7 @@ import {
   getSchemas,
   updateSchema,
 } from "./services/api";
+import { getView, setView } from "./services/storage";
 import Builder from "./views/Builder/Builder";
 import Renderer from "./views/Renderer/Renderer";
 
@@ -24,14 +25,18 @@ function App() {
       }[]
     | null
   >(null);
-  const [viewMode, setViewMode] = useState<"builder" | "preview">("builder");
+  const [viewMode, setViewMode] = useState(getView());
   const [isLoading, setIsLoading] = useState(true);
   const [initialDraftEntry, setInitialDraftEntry] =
     useState<BuilderFormData | null>(null);
   const [hasError, setHasError] = useState(false);
 
   const toggleViewMode = useCallback(() => {
-    setViewMode((prev) => (prev === "builder" ? "preview" : "builder"));
+    setViewMode((prev) => {
+      const v = prev === "builder" ? "preview" : "builder";
+      setView(v);
+      return v;
+    });
   }, []);
 
   const handleBuilderFormDataChange = useCallback(
