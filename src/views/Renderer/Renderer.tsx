@@ -48,7 +48,7 @@ function FormInputs(props: FormInputsProps) {
           name={`select-${props.index}`}
           options={props.inputInfo.options}
           ariaLabel={props.inputInfo.title}
-          className="mb-4"
+          className="mb-2"
           error={props.errorMessages[`select-${props.index}`]}
           containerClassName="mb-4"
         />
