@@ -16,7 +16,7 @@ const LOCAL_STORAGE_SCHEMA_KEY = "schema";
 export async function addQuestion(
   inputSchemas: BuilderFormData[],
   schemaId?: number,
-): Promise<{ schemaId: string; lastInsertedInputId: number }> {
+): Promise<{ schemaId: string; lastInsertedQuestionId: number }> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (randomIsError(errorProbability)) {
@@ -36,7 +36,7 @@ export async function addQuestion(
             );
             resolve({
               schemaId: String(schemaId),
-              lastInsertedInputId: parsedData[schemaId].length - 1,
+              lastInsertedQuestionId: parsedData[schemaId].length - 1,
             });
             return;
           }
@@ -55,7 +55,7 @@ export async function addQuestion(
         );
         resolve({
           schemaId: String(id),
-          lastInsertedInputId: inputSchemas.length,
+          lastInsertedQuestionId: inputSchemas.length,
         });
       } catch (e) {
         reject(e);
@@ -67,7 +67,7 @@ export async function addQuestion(
 export async function updateQuestion(
   inputSchema: BuilderFormData,
   schemaId: number,
-  inputId: number,
+  questionId: number,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -79,7 +79,7 @@ export async function updateQuestion(
         const existingData = localStorage.getItem(LOCAL_STORAGE_SCHEMA_KEY);
         if (existingData) {
           const parsedData = JSON.parse(existingData) as Schemas;
-          parsedData[schemaId][inputId] = inputSchema;
+          parsedData[schemaId][questionId] = inputSchema;
           localStorage.setItem(
             LOCAL_STORAGE_SCHEMA_KEY,
             JSON.stringify(parsedData),
