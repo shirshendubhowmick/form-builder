@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 import Button, { COLOR, INTENT } from "~/components/Button/Button";
 import Input from "~/components/Input/Input";
@@ -75,7 +76,7 @@ function Renderer(props: RendererProps) {
       const result = parseFormData(formData, validationSchema);
 
       if (result.data) {
-        console.log(result.data);
+        toast.success("Form submitted successfully");
         return;
       }
 
@@ -86,11 +87,15 @@ function Renderer(props: RendererProps) {
     [validationSchema],
   );
 
+  const onChange = useCallback(() => {
+    setErrorMessages({});
+  }, []);
+
   return (
     <div>
       <h1 className="mb-8">Preview</h1>
       <div className="mx-auto max-w-3xl">
-        <form onSubmit={onSubmit} className="flex flex-col">
+        <form onSubmit={onSubmit} className="flex flex-col" onChange={onChange}>
           {props.schema.map((input, index) => (
             <FormInputs
               // eslint-disable-next-line react/no-array-index-key
