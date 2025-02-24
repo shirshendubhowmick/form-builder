@@ -81,6 +81,12 @@ function Builder(props: BuilderProps) {
     [onChange, schemaId],
   );
 
+  const shouldShowAddMoreButton =
+    Boolean(builderFormData.length) && !showBuilderForm && !props.draftEntry;
+
+  const shouldShowNewQuestiopnForm =
+    !builderFormData.length || showBuilderForm || props.draftEntry;
+
   return (
     <div>
       <h1 className="mb-8">Form builder</h1>
@@ -136,18 +142,16 @@ function Builder(props: BuilderProps) {
           ))}
         </Accordion.Root>
 
-        {Boolean(builderFormData.length) &&
-          !showBuilderForm &&
-          !props.draftEntry && (
-            <Button
-              color={COLOR.primary}
-              intent={INTENT.primary}
-              onClick={onAddMoreQuestion}
-            >
-              Add more
-            </Button>
-          )}
-        {(!builderFormData.length || showBuilderForm || props.draftEntry) && (
+        {shouldShowAddMoreButton && (
+          <Button
+            color={COLOR.primary}
+            intent={INTENT.primary}
+            onClick={onAddMoreQuestion}
+          >
+            Add more
+          </Button>
+        )}
+        {shouldShowNewQuestiopnForm && (
           <>
             <div className="flex justify-end">
               {autoSaveStatus === AUTO_SAVE_STATUS.LOADING && (
