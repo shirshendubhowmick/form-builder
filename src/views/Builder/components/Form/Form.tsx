@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from "react";
+import { twJoin } from "tailwind-merge";
 
 import Button, { COLOR, INTENT } from "~/components/Button/Button";
 import Checkbox from "~/components/Checkbox/Checkbox";
@@ -21,6 +22,7 @@ export interface BuilderFormProps {
   isNewEntry?: boolean;
   initialState?: BuilderFormData;
   questionId?: number;
+  isSubmitting: boolean;
 }
 
 function Form(props: BuilderFormProps) {
@@ -123,7 +125,13 @@ function Form(props: BuilderFormProps) {
       {typeof props.questionId !== "undefined" && (
         <input type="hidden" value={props.questionId} name="formId" />
       )}
-      <Button type="submit" intent={INTENT.primary} color={COLOR.primary}>
+      <Button
+        type="submit"
+        intent={INTENT.primary}
+        color={COLOR.primary}
+        disabled={props.isSubmitting}
+        className={twJoin(props.isNewEntry ? "" : "hidden")}
+      >
         {typeof props.questionId === "undefined" ? "Add" : "Update"}
       </Button>
     </form>
