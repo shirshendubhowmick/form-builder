@@ -90,8 +90,8 @@ function Builder(props: BuilderProps) {
   return (
     <div>
       <h1 className="mb-8">Form builder</h1>
-      <div>
-        <Accordion.Root type="single" collapsible>
+      <div className="mx-auto max-w-3xl">
+        <Accordion.Root type="single" collapsible className="w-full">
           {builderFormData.map((input, index) => (
             // eslint-disable-next-line react/no-array-index-key
             <Accordion.Item key={index} value={String(index)}>
