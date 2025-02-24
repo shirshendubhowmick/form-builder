@@ -1,7 +1,9 @@
 import { BuilderFormData } from "~/schemas/builder";
 
-const delayInMs = 100;
-const errorProbability = 0.1;
+const DELAY_IN_MS = 100;
+const ERROR_PROBABILITY = 0.1;
+const LOCAL_STORAGE_SCHEMA_KEY = "schema";
+const LOCAL_STORAGE_DRAFT_KEY = "draft";
 
 function randomIsError(trueProbability: number): boolean {
   const probability = Math.max(0, Math.min(1, trueProbability));
@@ -14,8 +16,6 @@ export type Schema = {
   id: string;
   data: BuilderFormData[];
 };
-
-const LOCAL_STORAGE_SCHEMA_KEY = "schema";
 
 function convertStorageToSchema(storageSchema: SchemaStorage): Schema[] {
   return Object.entries(storageSchema).map(([key, value]) => {
@@ -32,8 +32,8 @@ export async function addSchema(
 ): Promise<{ schemaId: string; lastInsertedQuestionId: number }> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (randomIsError(errorProbability)) {
-        reject(new Error("Failed to add question"));
+      if (randomIsError(ERROR_PROBABILITY)) {
+        reject(new Error("Simulated error"));
         return;
       }
 
@@ -73,7 +73,7 @@ export async function addSchema(
       } catch (e) {
         reject(e);
       }
-    }, delayInMs);
+    }, DELAY_IN_MS);
   });
 }
 
@@ -84,8 +84,8 @@ export async function updateSchema(
 ): Promise<Schema[]> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (randomIsError(errorProbability)) {
-        reject(new Error("Failed to add question"));
+      if (randomIsError(ERROR_PROBABILITY)) {
+        reject(new Error("Simulated error"));
         return;
       }
       try {
@@ -104,15 +104,15 @@ export async function updateSchema(
       } catch (e) {
         reject(e);
       }
-    }, delayInMs);
+    }, DELAY_IN_MS);
   });
 }
 
-export async function getSchemas(): Promise<Schema[]> {
+export async function getSchemas(): Promise<Schema[] | null> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (randomIsError(errorProbability)) {
-        reject(new Error("Failed to get questions"));
+      if (randomIsError(ERROR_PROBABILITY)) {
+        reject(new Error("Simulated error"));
         return;
       }
       try {
@@ -122,11 +122,11 @@ export async function getSchemas(): Promise<Schema[]> {
           resolve(convertStorageToSchema(parsedData));
           return;
         }
-        reject(new Error(`No schemas found`));
+        resolve(null);
       } catch (e) {
         reject(e);
       }
-    }, delayInMs);
+    }, DELAY_IN_MS);
   });
 }
 
@@ -136,8 +136,8 @@ export async function deleteQuestionFromSchema(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (randomIsError(errorProbability)) {
-        reject(new Error("Failed to add question"));
+      if (randomIsError(ERROR_PROBABILITY)) {
+        reject(new Error("Simulated error"));
         return;
       }
       try {
@@ -159,6 +159,61 @@ export async function deleteQuestionFromSchema(
       } catch (e) {
         reject(e);
       }
-    }, delayInMs);
+    }, DELAY_IN_MS);
+  });
+}
+
+export async function createDraftEntry(data: BuilderFormData): Promise<void> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (randomIsError(ERROR_PROBABILITY)) {
+        reject(new Error("Simulated error"));
+        return;
+      }
+      try {
+        localStorage.setItem(LOCAL_STORAGE_DRAFT_KEY, JSON.stringify(data));
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    }, DELAY_IN_MS);
+  });
+}
+
+export async function getDraftEntry(): Promise<BuilderFormData | null> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (randomIsError(ERROR_PROBABILITY)) {
+        reject(new Error("Simulated error"));
+        return;
+      }
+      try {
+        const existingData = localStorage.getItem(LOCAL_STORAGE_DRAFT_KEY);
+        if (existingData) {
+          resolve(JSON.parse(existingData));
+          return;
+        }
+        resolve(null);
+      } catch (e) {
+        reject(e);
+      }
+    }, DELAY_IN_MS);
+  });
+}
+
+export async function deleteDraftEntry(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (randomIsError(ERROR_PROBABILITY)) {
+        reject(new Error("Simulated error"));
+        return;
+      }
+      try {
+        localStorage.removeItem(LOCAL_STORAGE_DRAFT_KEY);
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    }, DELAY_IN_MS);
   });
 }
