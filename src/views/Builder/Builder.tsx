@@ -32,7 +32,7 @@ export interface BuilderProps {
     schemaId?: string,
     questionId?: number,
   ) => Promise<void>;
-  onQuestionRemove: (inputId: number, formId: string) => void;
+  onQuestionRemove: (schemaId: string, questionId: number) => Promise<void>;
   schemaId?: string;
 }
 function Builder(props: BuilderProps) {
@@ -40,6 +40,7 @@ function Builder(props: BuilderProps) {
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     ValueOf<typeof AUTO_SAVE_STATUS>
   >(AUTO_SAVE_STATUS.IDLE);
+  const [isRemoveInProgress, setIsRemoveInProgress] = useState(false);
 
   const { builderFormData, onSubmit, schemaId, onQuestionRemove, onChange } =
     props;
@@ -57,8 +58,10 @@ function Builder(props: BuilderProps) {
   }, []);
 
   const onRemove = useCallback(
-    (inputId: number) => {
-      onQuestionRemove(inputId, schemaId!);
+    async (questionId: number) => {
+      setIsRemoveInProgress(true);
+      await onQuestionRemove(schemaId!, questionId);
+      setIsRemoveInProgress(false);
     },
     [schemaId, onQuestionRemove],
   );
@@ -105,8 +108,13 @@ function Builder(props: BuilderProps) {
                       intent={INTENT.icon}
                       color={COLOR.error}
                       onClick={() => onRemove(index)}
+                      disabled={isRemoveInProgress}
                     >
-                      <Trash2 />
+                      {isRemoveInProgress ? (
+                        <LoaderCircle className="animate-spin text-color-primary" />
+                      ) : (
+                        <Trash2 />
+                      )}
                     </Button>
                   </div>
                   <Form
