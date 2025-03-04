@@ -48,7 +48,7 @@ function App() {
     ) => {
       try {
         // Update case
-        if (schemaId && questionId) {
+        if (schemaId && typeof questionId === "number") {
           const updatedData = await updateSchema(data, schemaId, questionId);
           if (!isNewEntry) {
             setBuilderFormSchema(updatedData);

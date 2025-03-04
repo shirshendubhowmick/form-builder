@@ -24,6 +24,9 @@ function getValidationSchemaFromFormSchema(builderSchema: BuilderFormData[]) {
       case "number":
         {
           const numberSchema = z.string().transform((v) => {
+            if (!v) {
+              return undefined;
+            }
             return Number(v);
           });
 
