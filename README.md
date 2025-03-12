@@ -27,7 +27,7 @@ A dynamic form builder application built with React that allows you to create cu
 
 ## Demo
 
-Check out the live demo: [React Form Builder Demo](https://steady-strudel-4a71b5.netlify.app/)
+Check out the live demo: [React Form Builder Demo](https://dreamy-squirrel-4cd603.netlify.app/)
 
 ## Getting Started
 
