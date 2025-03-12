@@ -2,6 +2,8 @@
 
 React based dynamic form builder.
 
+![demo](screenshot/demo.gif)
+
 ## Getting started
 
 - Clone the repo
